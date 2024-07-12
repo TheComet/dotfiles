@@ -4,18 +4,17 @@ return {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
         "neovim/nvim-lspconfig",
+        "hrsh7th/cmp-nvim-lua",
         "hrsh7th/cmp-nvim-lsp",
-        "neovim/nvim-lspconfig",
-        "hrsh7th/cmp-nvim-lsp",
+        "hrsh7th/cmp-buffer",
         "hrsh7th/nvim-cmp",
         "L3MON4D3/LuaSnip",
+        "rafamadriz/friendly-snippets",
     },
     config = function()
         local lsp_zero = require("lsp-zero")
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
-        local cmp = require("cmp")
-        local cmp_action = lsp_zero.cmp_action()
 
         lsp_zero.on_attach(function(client, bufnr)
             local opts = { buffer = bufnr, remap = false }
@@ -70,11 +69,20 @@ return {
                             print(util.root_pattern(unpack(root_files))(fname) or util.find_git_ancestor(fname))
                             return util.root_pattern(unpack(root_files))(fname) or util.find_git_ancestor(fname)
                         end,
+                        on_new_config = function(new_config, new_cwd)
+                            require("cmake-tools").clangd_on_new_config(new_config)
+                        end,
                     })
                 end
             }
         })
 
+        -- this is the function that loads the extra snippets to luasnip
+        -- from rafamadriz/friendly-snippets
+        require('luasnip.loaders.from_vscode').lazy_load()
+
+        local cmp = require("cmp")
+        local cmp_action = lsp_zero.cmp_action()
         cmp.setup({
             formatting = lsp_zero.cmp_format({ details = false }),
             sources = {
