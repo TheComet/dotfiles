@@ -81,6 +81,14 @@ return {
         -- from rafamadriz/friendly-snippets
         require('luasnip.loaders.from_vscode').lazy_load()
 
+        -- Fix issue where pressing tab somewhere else after aborting completion teleports your
+        -- cursor back to where the last completion took place
+        local luasnip = require("luasnip")
+        luasnip.config.set_config({
+            region_check_events = 'InsertEnter',
+            delete_check_events = 'InsertLeave'
+        })
+
         local cmp = require("cmp")
         local cmp_action = lsp_zero.cmp_action()
         cmp.setup({
