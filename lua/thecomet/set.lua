@@ -1,3 +1,12 @@
+local function get_hostname()
+    local handle = io.popen("uname -n")
+    local hostname = handle:read("*a")
+    handle:close()
+    return hostname:gsub("%s+", "")
+end
+
+local hostname = get_hostname()
+
 -- Why
 vim.opt.guicursor = ""
 vim.opt.mouse = ""
@@ -7,9 +16,9 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 
 -- Sane settings for tabs
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+vim.opt.tabstop = hostname == "work" and 2 or 4
+vim.opt.softtabstop = hostname == "work" and 2 or 4
+vim.opt.shiftwidth = hostname == "work" and 2 or 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 
@@ -33,7 +42,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = "120"
+vim.opt.colorcolumn = hostname == "work" and "120" or "80"
 
 vim.g.mapleader = " "
 
