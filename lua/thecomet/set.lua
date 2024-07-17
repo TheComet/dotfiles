@@ -46,3 +46,11 @@ vim.opt.colorcolumn = hostname == "work" and "120" or "80"
 
 vim.g.mapleader = " "
 
+-- FLEX
+vim.o.errorformat = vim.o.errorformat .. ',%*["]%f%*["]\\, line %l: %m'
+vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*\\d: %t%*[^:]: %m'
+-- BISON
+vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*[0-9]: %m'
+vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
+vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
+
