@@ -38,6 +38,6 @@ return {
         handle:close()
         hostname = hostname:gsub("%s+", "")
 
-        return hostname == "work"
+        return hostname == "ripper"
     end
 }

@@ -20,15 +20,3 @@ vim.keymap.set("n", "<A-s>", "<CMD>lp<CR>")
 -- Select last changed text
 vim.keymap.set("n", "gp", "`[v`]")
 
-vim.api.nvim_create_autocmd("InsertEnter", {
-  pattern = "*",
-  callback = function()
-    vim.opt.relativenumber = false
-  end
-})
-vim.api.nvim_create_autocmd("InsertLeave", {
-  pattern = "*",
-  callback = function()
-    vim.opt.relativenumber = true
-  end
-})
