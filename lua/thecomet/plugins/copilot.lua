@@ -37,7 +37,6 @@ return {
         local hostname = handle:read("*a")
         handle:close()
         hostname = hostname:gsub("%s+", "")
-
-        return hostname == "ripper"
+        return hostname == "C017443" or hostname == "ripper"
     end
 }

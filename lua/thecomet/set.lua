@@ -16,9 +16,9 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 
 -- Sane settings for tabs
-vim.opt.tabstop = hostname == "work" and 2 or 4
-vim.opt.softtabstop = hostname == "work" and 2 or 4
-vim.opt.shiftwidth = hostname == "work" and 2 or 4
+vim.opt.tabstop = hostname == "C017443" and 2 or 4
+vim.opt.softtabstop = hostname == "C017443" and 2 or 4
+vim.opt.shiftwidth = hostname == "C017443" and 2 or 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 
@@ -42,7 +42,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = hostname == "work" and "120" or "80"
+vim.opt.colorcolumn = hostname == "C017443" and "120" or "80"
 
 vim.g.mapleader = " "
 
@@ -52,5 +52,5 @@ vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*\\d: %t%*[^:]: %m'
 -- BISON
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*[0-9]: %m'
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
-vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
+--vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
 
