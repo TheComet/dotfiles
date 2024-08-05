@@ -25,8 +25,8 @@ return {
                 terminal = {
                     name = "Main Terminal",
                     split_direction = "vertical",
-                    split_size = 80,
-                    focus = true, -- Focus on terminal when cmake task is launched.
+                    split_size = 100,
+                    --focus = true, -- Focus on terminal when cmake task is launched.
                 },
             },
         },

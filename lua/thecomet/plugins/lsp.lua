@@ -10,11 +10,13 @@ return {
         "hrsh7th/nvim-cmp",
         "L3MON4D3/LuaSnip",
         "rafamadriz/friendly-snippets",
+        "MysticalDevil/inlay-hints.nvim",
     },
     config = function()
         local lsp_zero = require("lsp-zero")
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
+        local hints = require("inlay-hints")
 
         lsp_zero.on_attach(function(client, bufnr)
             local opts = { buffer = bufnr, remap = false }
@@ -24,12 +26,17 @@ return {
             
             vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
             vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-            vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+            --vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
+            vim.keymap.set("n", "gD", "<CMD>Lspsaga peek_definition<CR>")
             vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+            vim.keymap.set("n", "gR", "<CMD>Lspsaga finder<CR>")
             vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
+            vim.keymap.set("n", "gC", "<CMD>Lspsaga incoming_calls<CR>")
             vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
+            vim.keymap.set("n", "gO", "<CMD>Lspsaga peek_type_declaration<CR>")
             vim.keymap.set("n", "<M-o>", "<CMD>ClangdSwitchSourceHeader<CR>")
-            vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, opts)
+            --vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, opts)
+            vim.keymap.set("n", "<leader>r", "<CMD>Lspsaga rename<CR>", {silent=true, noremap=true})
             vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
             vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, opts)
             vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, opts)
@@ -38,7 +45,14 @@ return {
             end, opts)
             vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
             vim.keymap.set({ "n", "v" }, "<leader>f", function()
-                vim.lsp.buf.format { async = true }
+                --vim.lsp.buf.format { async = true }
+                -- Bundled version of clang-format does wrong things, use system clang-format
+                --vim.cmd("normal! m'")
+                vim.g.cursor_position = vim.fn.winsaveview()
+                vim.cmd("%!clang-format")
+                vim.fn.winrestview(vim.g.cursor_position)
+                --vim.cmd("normal! g'")
+                --vim.defer_fn(function() vim.fn.winrestview(vim.g.cursor_position) end, 0)
             end, opts)
         end)
         
@@ -76,6 +90,12 @@ return {
                 end
             }
         })
+
+        hints.setup({
+            autocmd = { enable = false },
+            commands = { enable = true },
+        })
+        vim.keymap.set("n", "<leader>i", "<CMD>InlayHintsToggle<CR>")
 
         -- this is the function that loads the extra snippets to luasnip
         -- from rafamadriz/friendly-snippets
