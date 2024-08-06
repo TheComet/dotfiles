@@ -24,7 +24,8 @@ return {
             -- NOTE: Not required, we've mapped everything below already
             --lsp_zero.default_keymaps({buffer = bufnr})
             
-            vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+            --vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+            vim.keymap.set("n", "K", "<CMD>Lspsaga hover_doc ++keep<CR>", opts)
             vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
             --vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
             vim.keymap.set("n", "gD", "<CMD>Lspsaga peek_definition<CR>")
