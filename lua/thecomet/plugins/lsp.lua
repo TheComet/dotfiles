@@ -45,16 +45,12 @@ return {
                 print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
             end, opts)
             vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-            vim.keymap.set({ "n", "v" }, "<leader>f", function()
-                --vim.lsp.buf.format { async = true }
+            vim.keymap.set({ "n", "v" }, "<leader>f", vim.lsp.buf.format, opts) --function()
                 -- Bundled version of clang-format does wrong things, use system clang-format
-                --vim.cmd("normal! m'")
-                vim.g.cursor_position = vim.fn.winsaveview()
-                vim.cmd("%!clang-format")
-                vim.fn.winrestview(vim.g.cursor_position)
-                --vim.cmd("normal! g'")
-                --vim.defer_fn(function() vim.fn.winrestview(vim.g.cursor_position) end, 0)
-            end, opts)
+                --vim.g.cursor_position = vim.fn.winsaveview()
+                --vim.cmd("%!clang-format")
+                --vim.fn.winrestview(vim.g.cursor_position)
+            --end, opts)
         end)
         
         mason.setup({})

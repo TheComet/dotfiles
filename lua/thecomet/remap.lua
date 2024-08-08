@@ -20,9 +20,6 @@ vim.keymap.set("n", "<A-s>", "<CMD>lp<CR>")
 -- Select last changed text
 vim.keymap.set("n", "gp", "`[v`]")
 
--- Open terminal in split
-vim.keymap.set("n", "<leader>t", "<CMD>rightb vert term<CR>")
-
 -- Toggle relative/absolute line numbers
 vim.keymap.set("n", "<leader>l", "<CMD>set relativenumber!<CR>")
 

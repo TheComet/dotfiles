@@ -42,5 +42,6 @@ return {
     },
     config = function(_, opts)
         require("lspsaga").setup(opts)
+        vim.keymap.set("n", "<leader>t", "<CMD>Lspsaga term_toggle<CR>")
     end,
 }
