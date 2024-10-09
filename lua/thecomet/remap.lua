@@ -3,8 +3,10 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("v", "J", ">m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ">m '>-2<CR>gv=gv")
 
-vim.keymap.set("n", "<leader>aj", ":.!justifier -w 79<CR>")
-vim.keymap.set("v", "<leader>aj", ":!justifier -w 79<CR>")
+-- Justify text
+justifier_script = vim.fn.stdpath("config") .. "/lua/thecomet/justifier.py"
+vim.keymap.set("n", "<leader>j", ":.!python3 " .. justifier_script .. " -w 79<CR>")
+vim.keymap.set("v", "<leader>j", ":'<,'>!python3 " .. justifier_script .. " -w 79<CR>")
 
 -- If text is highlighted in visual mode, and "/" is pressed, paste the highlighted text into the prompt
 vim.keymap.set("v", "//", "y/<C-R>=escape(@\", '/')<CR>")
