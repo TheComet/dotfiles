@@ -53,4 +53,6 @@ vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*\\d: %t%*[^:]: %m'
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*[0-9]: %m'
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
 --vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
+-- CMake
+vim.o.errorformat = vim.o.errorformat .. ',CMake Error at %f:%l%.%#'
 
