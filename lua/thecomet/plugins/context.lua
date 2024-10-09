@@ -14,4 +14,8 @@ return {
         zindex = 20, -- The Z-index of the context window
         on_attach = nil, -- (fun(buf: integer): boolean) return false to disable attaching
     },
+    config = function(_, opts)
+        context = require("treesitter-context").setup(opts)
+        vim.keymap.set("n", "<leader>o", "<CMD>TSContextToggle<CR>")
+    end
 }
