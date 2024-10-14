@@ -3,7 +3,7 @@ return {
     build = ":TSUpdate",
     opts = {
         ensure_installed = {
-            "c", "cpp", "lua"
+            "c", "cpp", "lua", "markdown"
         },
         -- Install parsers synchronously (only applied to 'ensure_installed')
         sync_install = false,
