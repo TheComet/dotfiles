@@ -17,21 +17,21 @@ return {
                 doxygenwarning = { pattern = "[\\@]warning", group = "MiniHipatternsFixme"},
             }
         })
-        require("mini.pairs").setup({
-            mappings = {
-                ['('] = { action = 'open', pair = '()', neigh_pattern = '[^\\].' },
-                ['['] = { action = 'open', pair = '[]', neigh_pattern = '[^\\].' },
-                ['{'] = { action = 'open', pair = '{}', neigh_pattern = '[^\\].' },
-            
-                [')'] = { action = 'close', pair = '()', neigh_pattern = '[^\\].' },
-                [']'] = { action = 'close', pair = '[]', neigh_pattern = '[^\\].' },
-                ['}'] = { action = 'close', pair = '{}', neigh_pattern = '[^\\].' },
-            
-                ['"'] = { action = 'closeopen', pair = '""', neigh_pattern = '[^\\].', register = { cr = false } },
-                ["'"] = { action = 'closeopen', pair = "''", neigh_pattern = '[^%a\\].', register = { cr = false } },
-                ['`'] = { action = 'closeopen', pair = '``', neigh_pattern = '[^\\].', register = { cr = false } },
-            },
-        })
+        --require("mini.pairs").setup({
+        --    mappings = {
+        --        ['('] = { action = 'open', pair = '()', neigh_pattern = '[^\\].' },
+        --        ['['] = { action = 'open', pair = '[]', neigh_pattern = '[^\\].' },
+        --        ['{'] = { action = 'open', pair = '{}', neigh_pattern = '[^\\].' },
+        --    
+        --        [')'] = { action = 'close', pair = '()', neigh_pattern = '[^\\].' },
+        --        [']'] = { action = 'close', pair = '[]', neigh_pattern = '[^\\].' },
+        --        ['}'] = { action = 'close', pair = '{}', neigh_pattern = '[^\\].' },
+        --    
+        --        ['"'] = { action = 'closeopen', pair = '""', neigh_pattern = '[^\\].', register = { cr = false } },
+        --        ["'"] = { action = 'closeopen', pair = "''", neigh_pattern = '[^%a\\].', register = { cr = false } },
+        --        ['`'] = { action = 'closeopen', pair = '``', neigh_pattern = '[^\\].', register = { cr = false } },
+        --    },
+        --})
         require("mini.splitjoin").setup({
             mappings = {
                 toggle = 'gS',
