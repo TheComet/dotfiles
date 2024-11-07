@@ -55,7 +55,7 @@ return {
         
         mason.setup({})
         mason_lspconfig.setup({
-            ensure_installed = { "clangd" },
+            ensure_installed = { "clangd", "lua_ls" },
             handlers = {
                 function(server_name)
                     require("lspconfig")[server_name].setup({})
