@@ -111,14 +111,17 @@ return {
             local dap = require("dap")
             ui.setup(opts)
 
+            vim.keymap.set("n", "<leader>do", ui.open)
+            vim.keymap.set("n", "<leader>dc", ui.close)
+
             dap.listeners.after.event_initialized["dapui_config"] = function()
                 ui.open()
             end
             dap.listeners.before.event_terminated["dapui_config"] = function()
-                ui.close()
+                --ui.close()
             end
             dap.listeners.before.event_exited["dapui_config"] = function()
-                ui.close()
+                --ui.close()
             end
         end
     },
