@@ -6,12 +6,12 @@ return {
         cmake_use_preset = true,
         cmake_regenerate_on_save = false, -- auto generate when save CMakeLists.txt
         cmake_generate_options = { "-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja" }, -- this will be passed when invoke `CMakeGenerate`
-        cmake_build_options = { "--parallel $(nproc)" }, -- this will be passed when invoke `CMakeBuild`
+        cmake_build_options = { "--parallel 32" }, -- this will be passed when invoke `CMakeBuild`
         -- support macro expansion:
         --             ${kit}
         --             ${kitGenerator}
         --             ${variant:xx}
-        cmake_build_directory = "build",
+        cmake_build_directory = "build-${variant:buildType}",
         cmake_soft_link_compile_commands = true,
         cmake_compile_commands_from_lsp = false,
         cmake_kits_path = nil, -- this is used to specify global cmake kits path, see CMakeKits for detailed usage

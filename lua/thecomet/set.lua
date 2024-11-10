@@ -55,4 +55,5 @@ vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
 --vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
 -- CMake
 vim.o.errorformat = vim.o.errorformat .. ',CMake Error at %f:%l%.%#'
-
+-- GTest
+vim.o.errorformat = vim.o.errorformat .. ',%f:%l: Failure'
