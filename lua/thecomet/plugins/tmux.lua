@@ -13,4 +13,7 @@ return {
         { "<A-k>", "<CMD>TmuxNavigateUp<CR>" },
         { "<A-j>", "<CMD>TmuxNavigateDown<CR>" },
     },
+    setup = function()
+        vim.g.tmux_navigator_no_mappings = 1
+    end,
 }
