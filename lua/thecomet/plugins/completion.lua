@@ -15,28 +15,31 @@ return {
         local lsp_zero = require("lsp-zero")
         local ls = require("luasnip")
 
-
         -- #1 This is the function that loads the extra snippets to luasnip
         -- from rafamadriz/friendly-snippets
         require('luasnip.loaders.from_vscode').lazy_load()
 
-        -- Fix issue where pressing tab somewhere else after aborting completion teleports your
-        -- cursor back to where the last completion took place
-        ls.config.set_config({
-            region_check_events = 'InsertEnter',
-            delete_check_events = 'InsertLeave'
+        require("luasnip.loaders.from_lua").load({
+            paths = vim.fn.getcwd() .. "/.nvim/luasnippets",
+            fs_event_providers = {
+                autocmd = true,
+                libuv = true
+            }
         })
 
-        local s = ls.snippet
-        local t = ls.text_node
-        local i = ls.insert_node
-        local extras = require("luasnip.extras")
-        ls.add_snippets("lua", {
-            s("hello", {
-                t('print("Hello '),
-                i(1),
-                t(' world")')
-            }),
+        ls.config.set_config({
+            -- Remember to keep around the last snippet. You can jump back into
+            -- it even if you move outside of the selection
+            history = true,
+
+            -- Update as you type (in dynamic snippets)
+            updateevents = "TextChanged,TextChangedI",
+
+            -- Fix issue where pressing tab somewhere else after aborting
+            -- completion teleports your cursor back to where the last
+            -- completion took place
+            region_check_events = 'InsertEnter',
+            delete_check_events = 'InsertLeave'
         })
 
         local cmp_action = lsp_zero.cmp_action()
