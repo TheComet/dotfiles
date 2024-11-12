@@ -7,6 +7,7 @@ return {
         "hrsh7th/cmp-nvim-lsp",
         "hrsh7th/cmp-buffer",
         "saadparwaiz1/cmp_luasnip",
+        "doxnit/cmp-luasnip-choice",
         -- vscode snippet collection. See #1
         "rafamadriz/friendly-snippets",
     },
@@ -38,9 +39,31 @@ return {
             -- Fix issue where pressing tab somewhere else after aborting
             -- completion teleports your cursor back to where the last
             -- completion took place
-            region_check_events = 'InsertEnter',
-            delete_check_events = 'InsertLeave'
+            --region_check_events = 'InsertEnter',
+            --delete_check_events = 'InsertLeave'
         })
+
+        -- These are handled by nvim-cmp
+        --vim.keymap.set({"i", "s"}, "<C-l>", function()
+        --    if ls.expand_or_jumpable() then
+        --        ls.expand_or_jump()
+        --    end
+        --end, { silent = true })
+        --vim.keymap.set({"i", "s"}, "<C-h>", function()
+        --    if ls.jumpable(-1) then
+        --        ls.jump(-1)
+        --    end
+        --end, { silent = true })
+        vim.keymap.set({"i", "s"}, "<C-j>", function()
+            if ls.choice_active() then
+                ls.change_choice(1)
+            end
+        end, { silent = true })
+        vim.keymap.set({"i", "s"}, "<C-k>", function()
+            if ls.choice_active() then
+                ls.change_choice(-1)
+            end
+        end, { silent = true })
 
         local cmp_action = lsp_zero.cmp_action()
         cmp.setup({
@@ -51,10 +74,11 @@ return {
                 end,
             },
             sources = {
+                { name = "luasnip", keyword_length = 3 },
                 { name = "nvim_lsp" },
-                --{ name = "nvim_lua" },
-                { name = "luasnip", keyword_length = 2 },
+                { name = "nvim_lua" },
                 { name = "buffer",  keyword_length = 3 },
+                { name = "luasnip_choice" },
             },
             mapping = cmp.mapping.preset.insert({
                 -- Confirm completion, and select first by default
@@ -68,8 +92,8 @@ return {
                 ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
 
                 -- Navigate between snippet placeholders
-                ["<tab>"] = cmp_action.luasnip_jump_forward(),
-                ["<S-tab>"] = cmp_action.luasnip_jump_backward(),
+                ["<C-l>"] = cmp_action.luasnip_jump_forward(),
+                ["<C-h>"] = cmp_action.luasnip_jump_backward(),
 
                 -- Scroll up and down in the completion documentation
                 ["<Up>"] = cmp.mapping.scroll_docs(-4),
