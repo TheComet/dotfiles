@@ -7,7 +7,8 @@ return {
     { "jacoborus/tender.vim", name = "tender" },
     { "bluz71/vim-nightfly-colors", name = "nightfly",
       config = function()
-          vim.cmd.colorscheme("nightfly")
+          --vim.cmd.colorscheme("nightfly")
+          vim.cmd.colorscheme("catppuccin")
           vim.keymap.set("n", "<leader>pc", "<CMD>Telescope colorscheme<CR>")
       end},
     { "bluz71/vim-moonfly-colors", name = "moonfly" },
