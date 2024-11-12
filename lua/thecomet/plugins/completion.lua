@@ -64,6 +64,9 @@ return {
                 ls.change_choice(-1)
             end
         end, { silent = true })
+        vim.keymap.set("n", "<leader>co", function()
+            vim.cmd.edit(".nvim/luasnippets/snippets.lua")
+        end)
 
         local cmp_action = lsp_zero.cmp_action()
         cmp.setup({
