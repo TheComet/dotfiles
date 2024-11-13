@@ -9,7 +9,7 @@ return {
         "saadparwaiz1/cmp_luasnip",
         "doxnit/cmp-luasnip-choice",
         -- vscode snippet collection. See #1
-        "rafamadriz/friendly-snippets",
+        --"rafamadriz/friendly-snippets",
     },
     config = function()
         local cmp = require("cmp")
@@ -18,7 +18,7 @@ return {
 
         -- #1 This is the function that loads the extra snippets to luasnip
         -- from rafamadriz/friendly-snippets
-        require('luasnip.loaders.from_vscode').lazy_load()
+        --require('luasnip.loaders.from_vscode').lazy_load()
 
         require("luasnip.loaders.from_lua").load({
             paths = vim.fn.getcwd() .. "/.nvim/luasnippets",
