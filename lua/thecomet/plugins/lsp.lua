@@ -11,6 +11,8 @@ return {
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
 
+        vim.lsp.set_log_level("off")
+
         lsp_zero.on_attach(function(client, bufnr)
             local opts = { buffer = bufnr, remap = false }
             -- see :help lsp-zero-keybindings to learn the available actions
