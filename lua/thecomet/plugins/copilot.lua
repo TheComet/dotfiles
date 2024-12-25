@@ -13,7 +13,6 @@ return {
             end
         end,
         {nargs = 0})
-        vim.keymap.set("n", "<leader>ac", "<CMD>CopilotToggle<CR>", {silent = true})
 
         -- Request completion from copilot, even if it is disabled
         vim.keymap.set("i", "<C-\\>", '<Plug>(copilot-suggest)')
