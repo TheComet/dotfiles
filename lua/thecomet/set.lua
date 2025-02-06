@@ -1,12 +1,3 @@
-local function get_hostname()
-    local handle = io.popen("uname -n")
-    local hostname = handle:read("*a")
-    handle:close()
-    return hostname:gsub("%s+", "")
-end
-
-local hostname = get_hostname()
-
 -- Why
 vim.opt.guicursor = ""
 vim.opt.mouse = ""
@@ -16,11 +7,11 @@ vim.opt.nu = true
 vim.opt.relativenumber = true
 
 -- Sane settings for tabs
-vim.opt.tabstop = hostname == "C017443" and 2 or 4
-vim.opt.softtabstop = hostname == "C017443" and 2 or 4
-vim.opt.shiftwidth = hostname == "C017443" and 2 or 4
-vim.opt.expandtab = true
-vim.opt.smartindent = true
+--vim.opt.tabstop = hostname == "C017443" and 2 or 4
+--vim.opt.softtabstop = hostname == "C017443" and 2 or 4
+--vim.opt.shiftwidth = hostname == "C017443" and 2 or 4
+--vim.opt.expandtab = true
+--vim.opt.smartindent = true
 
 -- Don't wrap text, don't insert newlines when I don't want them
 vim.opt.wrap = true
