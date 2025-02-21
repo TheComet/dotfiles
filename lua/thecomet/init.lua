@@ -13,8 +13,8 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 -- Remaps and settings
-require("thecomet.set")
-require("thecomet.remap")
+require("thecomet.options")
+require("thecomet.keymap")
 
 -- Load plugins
 require("lazy").setup("thecomet.plugins")
