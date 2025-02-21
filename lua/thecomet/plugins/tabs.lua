@@ -5,6 +5,8 @@ local function get_hostname()
     return hostname:gsub("%s+", "")
 end
 
+local c_tabwidth = get_hostname() == "C017443" and 2 or 4
+
 return {
     "FotiadisM/tabset.nvim",
     opts = {
@@ -14,11 +16,9 @@ return {
         },
         languages = {
             {
-                filetypes = { "c", "cpp", "h", "hpp" },
+                filetypes = { "c", "cpp", "h", "hpp", "cmake" },
                 config = {
-                    tabwidth = function()
-                        return get_hostname() == "C017443" and 2 or 4
-                    end,
+                    tabwidth = c_tabwidth,
                     expandtab = true,
                 }
             },
