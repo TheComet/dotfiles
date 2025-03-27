@@ -15,6 +15,7 @@ return {
                 doxygenreturn = { pattern = "[\\@]return", group = "MiniHipatternsNote"},
                 doxygennote = { pattern = "[\\@]note", group = "MiniHipatternsHack"},
                 doxygenwarning = { pattern = "[\\@]warning", group = "MiniHipatternsFixme"},
+                doxygenwarning = { pattern = "[\\@]see", group = "MiniHipatternsNote"},
             }
         })
         --require("mini.pairs").setup({
