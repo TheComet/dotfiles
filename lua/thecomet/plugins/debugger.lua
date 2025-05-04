@@ -82,6 +82,7 @@ return {
                 debug_map:set("n", "<leader>dt", function() dap.terminate() ui.close() debug_map:clear() end)
                 debug_map:set("n", "<leader>do", function() require("dapui").float_element("rtt") end)
                 debug_map:set("n", "<leader>dc", function() ui.close() debug_map:clear() end)
+                debug_map:set("n", "<leader>dp", dap.pause)
                 debug_map:set("n", "<A-r>", dap.continue)
                 debug_map:set("n", "<C-n>", dap.step_over)
                 debug_map:set("n", "<A-n>", dap.step_back)

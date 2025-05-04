@@ -3,9 +3,9 @@ return {
     opts = {
         cmake_command = "cmake", -- this is used to specify cmake command path
         ctest_command = "ctest", -- this is used to specify ctest command path
-        cmake_use_preset = true,
+        cmake_use_preset = false,
         cmake_regenerate_on_save = false, -- auto generate when save CMakeLists.txt
-        cmake_generate_options = { "-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -GNinja" }, -- this will be passed when invoke `CMakeGenerate`
+        cmake_generate_options = {}, -- this will be passed when invoke `CMakeGenerate`
         cmake_build_options = { "--parallel 32" }, -- this will be passed when invoke `CMakeBuild`
         -- support macro expansion:
         --             ${kit}
