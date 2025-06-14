@@ -18,3 +18,6 @@ require("thecomet.keymap")
 
 -- Load plugins
 require("lazy").setup("thecomet.plugins")
+
+-- Local imports
+require("thecomet.ngspice")
