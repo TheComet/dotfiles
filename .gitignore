@@ -1,0 +1,11 @@
+*
+!.gitignore
+!.config
+!.config/gdb
+!.config/gdb/*
+!.tmux.conf
+!scripts
+!scripts/fzfpdf.sh
+!scripts/changemac.sh
+#!.config/nvim
+#!.config/nvim/*
