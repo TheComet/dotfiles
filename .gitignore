@@ -7,5 +7,5 @@
 !scripts
 !scripts/fzfpdf.sh
 !scripts/changemac.sh
-#!.config/nvim
-#!.config/nvim/*
+!.config/nvim
+!.config/nvim/*
