@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 if [[ $# -eq 1 ]]; then
     selected="$1"
@@ -7,12 +7,10 @@ else
     if [[ "$PWD" != "$HOME" ]]; then
         dirs+=("$PWD")
     fi
-    #dirs+=(
-    #    ~/documents/banking
-    #    ~/documents/post
-    #    ~/Downloads
-    #    ~/documents/electronics/pcb_projects/jobs
-    #)
+    dirs+=(
+        ~/pdf
+        ~/Downloads
+    )
     selected=$(
         find ${dirs[@]} -iname "*.pdf" | \
         fzf --preview "pdftotext -f 1 -l 5 {} -" --preview-window=up:50%:wrap
