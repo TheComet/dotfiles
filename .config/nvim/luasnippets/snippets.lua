@@ -44,7 +44,7 @@ c_and_cpp_snippets = {
   ),
   s({ trig = "fprintf", docstring = "fprintf" }, {
     t("fprintf("),
-    c(1, { i(1, "fp"), i(2, "stderr"), i(3, "stdout") }),
+    c(1, { i(1, "stderr"), i(2, "fp"), }),
     t(', "'), i(2, ""), t('\\n"'),
     d(3, function(values)
       local fmt_string = values[1][1]
@@ -57,6 +57,8 @@ c_and_cpp_snippets = {
       return sn(1, nodes)
     end, { 2 }),
     t(");"),
+  }, {
+    stored = {},
   }),
 
   s({ trig = "printf", docstring = "printf" }, {
@@ -73,6 +75,8 @@ c_and_cpp_snippets = {
       return sn(1, nodes)
     end, { 1 }),
     t(");"),
+  }, {
+    stored = {},
   }),
 }
 

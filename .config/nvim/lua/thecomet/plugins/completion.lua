@@ -71,6 +71,9 @@ return {
       vim.cmd.edit(vim.fn.stdpath("config") .. "/luasnippets/snippets.lua")
     end)
     vim.keymap.set("n", "<leader>s2", function()
+      vim.cmd.edit(vim.fn.getenv("HOME") .. "/.nvim/luasnippets/snippets.lua")
+    end)
+    vim.keymap.set("n", "<leader>s3", function()
       vim.cmd.edit(vim.fn.getcwd() .. "/.nvim/luasnippets/snippets.lua")
     end)
 
