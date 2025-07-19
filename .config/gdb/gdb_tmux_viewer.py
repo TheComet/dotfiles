@@ -34,9 +34,13 @@ class TmuxViewerHook(gdb.Command):
         super().__init__("tmux-viewer-init", gdb.COMMAND_USER)
         gdb.events.stop.connect(self.on_stop)
         gdb.events.exited.connect(self.on_exit)
-        self.tmux_controller = TmuxPaneController()
+        self.tmux_controller = None
         self.current_filename = None
         self.current_file = None
+
+    def on_exit(self, event):
+        self.tmux_controller.close()
+        self.tmux_controller = None
 
     def load_file(self, filename):
         if self.current_filename == filename:
@@ -100,6 +104,9 @@ class TmuxViewerHook(gdb.Command):
         return "\r\n".join(output)
 
     def on_stop(self, event):
+        if not self.tmux_controller:
+            self.tmux_controller = TmuxPaneController()
+
         try:
             frame = gdb.selected_frame()
             sal = frame.find_sal()
@@ -120,10 +127,7 @@ class TmuxViewerHook(gdb.Command):
         except Exception as e:
             gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
 
-    def on_exit(self, event):
-        self.tmux_controller.close()
-
     def invoke(self, arg, from_tty):
-        gdb.write("[tmux-viewer] Initialized\n")
+        pass
 
 TmuxViewerHook()
