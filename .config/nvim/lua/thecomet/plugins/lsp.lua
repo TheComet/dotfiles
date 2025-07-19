@@ -49,7 +49,7 @@ return {
         print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
       end, opts)
       vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-      vim.keymap.set({ "n", "v" }, "<leader>f", vim.lsp.buf.format, opts)       --function()
+      vim.keymap.set({ "n", "v" }, "<leader>f", vim.lsp.buf.format, opts) --function()
       -- Bundled version of clang-format does wrong things, use system clang-format
       --vim.g.cursor_position = vim.fn.winsaveview()
       --vim.cmd("%!clang-format")
@@ -84,11 +84,13 @@ return {
                 "compile_commands.json",
                 "compile_flags.txt",
               }
-              print(util.root_pattern(unpack(root_files))(fname) or util.find_git_ancestor(fname))
               return util.root_pattern(unpack(root_files))(fname) or util.find_git_ancestor(fname)
             end,
             on_new_config = function(new_config, new_cwd)
-              require("cmake-tools").clangd_on_new_config(new_config)
+              local status, cmake = pcall(require, "cmake-tools")
+              if status then
+                cmake.clangd_on_new_config(new_config)
+              end
             end,
           })
         end

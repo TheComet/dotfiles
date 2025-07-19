@@ -50,3 +50,10 @@ vim.api.nvim_create_autocmd("BufEnter", {
     })
   end,
 })
+
+vim.api.nvim_create_autocmd("BufRead", {
+  pattern = "*.spice,*.cir,*.net",
+  callback = function()
+    vim.bo.filetype = "spice"
+  end,
+})
