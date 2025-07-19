@@ -8,24 +8,6 @@ set auto-load local-gdbinit on
 set auto-load safe-path /
 set auto-load python-scripts on
 
-# Don't print out line after ever step
-define n
-    set logging file /dev/null
-    set logging redirect on
-    set logging enabled on
-    next
-    set logging enabled off
-    display
-end
-define s
-    set logging file /dev/null
-    set logging redirect on
-    set logging enabled on
-    next
-    set logging enabled off
-    display
-end
-
 python
 import glob
 from os import getenv

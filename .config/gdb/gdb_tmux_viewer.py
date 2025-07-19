@@ -39,8 +39,9 @@ class TmuxViewerHook(gdb.Command):
         self.current_file = None
 
     def on_exit(self, event):
-        self.tmux_controller.close()
-        self.tmux_controller = None
+        if self.tmux_controller:
+            self.tmux_controller.close()
+            self.tmux_controller = None
 
     def load_file(self, filename):
         if self.current_filename == filename:
@@ -103,10 +104,9 @@ class TmuxViewerHook(gdb.Command):
         output.append(f"\033[1;34m{filename}\033[0m")
         return "\r\n".join(output)
 
-    def on_stop(self, event):
+    def update_source_pane(self):
         if not self.tmux_controller:
             self.tmux_controller = TmuxPaneController()
-
         try:
             frame = gdb.selected_frame()
             sal = frame.find_sal()
@@ -121,13 +121,24 @@ class TmuxViewerHook(gdb.Command):
             ]).decode().strip()
             height = int(height_str)
 
-            output = self.get_source_bat(filename, lineno, height)
+            try:
+                output = self.get_source_bat(filename, lineno, height)
+            except Exception:
+                output = self.get_source_custom(filename, lineno, height)
             self.tmux_controller.send_to_pane(output)
 
         except Exception as e:
             gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
 
+    def on_stop(self, event):
+        self.update_source_pane()
+
     def invoke(self, arg, from_tty):
         pass
 
-TmuxViewerHook()
+tmux_viewer = TmuxViewerHook()
+
+def prompt_handler():
+    tmux_viewer.update_source_pane()
+
+gdb.events.before_prompt.connect(prompt_handler)
