@@ -105,10 +105,15 @@ class TmuxViewerHook(gdb.Command):
         return "\r\n".join(output)
 
     def update_source_pane(self):
-        if not self.tmux_controller:
-            self.tmux_controller = TmuxPaneController()
         try:
             frame = gdb.selected_frame()
+        except gdb.error:
+            return
+
+        if not self.tmux_controller:
+            self.tmux_controller = TmuxPaneController()
+
+        try:
             sal = frame.find_sal()
             if not sal or not sal.symtab:
                 return

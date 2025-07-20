@@ -169,17 +169,13 @@ end)
 vim.keymap.set("n", "<leader>dt", function()
   local suite = find_suite_name()
   local test = find_test_name()
-  if not suite then
+  if not suite or not test then
     error("No tests found")
     return
   end
 
   local args = get_program_special_args() or {}
-  if test then
-    table.insert(args, "--gtest_filter=" .. suite .. "." .. test)
-  else
-    table.insert(args, '--gtest_filter="' .. suite .. '.*"')
-  end
+  table.insert(args, "--gtest_filter=" .. suite .. "." .. test)
 
   run_command_in_gdb(args)
 end)
