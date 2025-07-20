@@ -70,11 +70,21 @@ vim.fn.sign_define("DebugBreakpoint", {
   priority = 50,
 })
 
-local function load_gdbinit()
+local function gdbinit_filepath()
   local cmake = require("cmake-tools")
   local executable = cmake.get_launch_target_path()
+  if not executable then
+    return nil
+  end
   local working_dir = vim.fs.dirname(executable)
-  local gdb_init = working_dir .. "/.gdbinit"
+  return working_dir .. "/.gdbinit"
+end
+
+local function load_gdbinit()
+  local gdb_init = gdbinit_filepath()
+  if not gdb_init then
+    return {}
+  end
 
   -- Load gdbinit file and split newlines
   local gdb_commands = {}
@@ -91,15 +101,11 @@ local function load_gdbinit()
   return gdb_commands
 end
 
-local function gdbinit_filename()
-  local cmake = require("cmake-tools")
-  local executable = cmake.get_launch_target_path()
-  local working_dir = vim.fs.dirname(executable)
-  return working_dir .. "/.gdbinit"
-end
-
 local function save_gdbinit(gdb_commands)
-  local gdb_init = gdbinit_filename()
+  local gdb_init = gdbinit_filepath()
+  if not gdb_init then
+    return
+  end
   local file = io.open(gdb_init, "w")
   if file then
     for _, command in ipairs(gdb_commands) do
@@ -141,8 +147,11 @@ end
 local function run_command_in_gdb(args)
   local cmake = require("cmake-tools")
   local executable = cmake.get_launch_target_path()
+  if not executable then
+    error("No executable found. Please configure the project first (using cmake-tools).")
+    return
+  end
   local working_dir = vim.fs.dirname(executable)
-  args = args and args or cmake.get_launch_args()
   local command = string.format("tmux split-window -c %s -h 'gdb --args %s %s'",
     working_dir,
     executable,
@@ -194,7 +203,10 @@ vim.keymap.set("n", "<leader>ds", function()
 end)
 
 vim.keymap.set("n", "<leader>dc", function()
-  vim.cmd("split " .. gdbinit_filename())
+  local gdbinit = gdbinit_filepath()
+  if gdbinit then
+    vim.cmd("split " .. gdbinit)
+  end
 end)
 
 vim.keymap.set("n", "<leader>db", function()
