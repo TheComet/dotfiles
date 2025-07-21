@@ -12,7 +12,6 @@ return {
       end},
     { "bluz71/vim-moonfly-colors", name = "moonfly" },
     { "savq/melange-nvim", name = "melange" },
-    { "scottmckendry/cyberdream.nvim", name = "cyberdream" },
     { "EdenEast/nightfox.nvim", name = "nightfox" },
     { "sharpchen/Eva-Theme.nvim", name = "Eva-Theme" },
     { "rose-pine/neovim", name = "rose-pine" },
@@ -32,5 +31,5 @@ return {
     { "lunarvim/synthwave84.nvim", name = "synthwave84" },
     { "pauchiner/pastelnight.nvim", name = "pastelnight" },
     { "PunGrumpy/dullahan.nvim", name = "dullahan" },
-    { "Biscuit-Theme/nvim", name = "biscuit" }
+    { "Biscuit-Theme/nvim", name = "biscuit" },
 }

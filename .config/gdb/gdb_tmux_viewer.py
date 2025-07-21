@@ -76,7 +76,7 @@ class TmuxViewerHook(gdb.Command):
         start = max(lineno - half_height, 1)
         end = start + height - 1
         lines = subprocess.check_output([
-            "bat",
+            "batcat",
             "--color=always",
             "--style=numbers",
             "--highlight-line",

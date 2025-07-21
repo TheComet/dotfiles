@@ -8,6 +8,8 @@ set auto-load local-gdbinit on
 set auto-load safe-path /
 set auto-load python-scripts on
 
+source ~/.gdbinit
+
 python
 import glob
 from os import getenv

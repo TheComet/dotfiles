@@ -6,13 +6,6 @@ vim.opt.mouse = ""
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
--- Sane settings for tabs
---vim.opt.tabstop = hostname == "C017443" and 2 or 4
---vim.opt.softtabstop = hostname == "C017443" and 2 or 4
---vim.opt.shiftwidth = hostname == "C017443" and 2 or 4
---vim.opt.expandtab = true
---vim.opt.smartindent = true
-
 -- Don't wrap text, don't insert newlines when I don't want them
 vim.opt.wrap = true
 vim.opt.formatoptions = "cqj"
@@ -33,7 +26,7 @@ vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
-vim.opt.colorcolumn = hostname == "C017443" and "120" or "80"
+vim.opt.colorcolumn = "80"
 
 vim.g.mapleader = " "
 
@@ -115,7 +108,23 @@ local function save_gdbinit(gdb_commands)
   end
 end
 
-local function find_suite_name()
+local function find_testing_framework()
+  local buf = vim.api.nvim_get_current_buf()
+  local cursor = vim.api.nvim_win_get_cursor(0)
+  local row = cursor[1]
+  for i = row, 1, -1 do
+    local line = vim.api.nvim_buf_get_lines(buf, i - 1, i, false)[1]
+    if line:match("#include \"CppUTest/TestHarness%.h") then
+      return "CppUTest"
+    end
+    if line:match("#include \"gmock/gmock.h") then
+      return "gtest"
+    end
+  end
+  return nil
+end
+
+local function find_suite_define()
   local buf = vim.api.nvim_get_current_buf()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local row = cursor[1]
@@ -129,16 +138,19 @@ local function find_suite_name()
   return nil
 end
 
-local function find_test_name()
+local function find_test_and_suite_names()
   local buf = vim.api.nvim_get_current_buf()
   local cursor = vim.api.nvim_win_get_cursor(0)
   local row = cursor[1]
+  local pattern = "TEST_?[FP]?%(([%w_]+),%s*([%w_]+)%)"
   for i = row, 1, -1 do
-    -- TEST, TEST_F, TEST_P
     local line = vim.api.nvim_buf_get_lines(buf, i - 1, i, false)[1]
-    local test = line:match("TEST%s*%(%s*NAME%s*,%s*(%S+)%s*%)") or line:match("TEST_F%s*%(%s*NAME%s*,%s*(%S+)%s*%)")
-    if test then
-      return test
+    local suite, test = line:match(pattern)
+    if suite == "NAME" then
+      suite = find_suite_define()
+    end
+    if suite and test then
+      return suite, test
     end
   end
   return nil
@@ -166,7 +178,7 @@ local function get_program_special_args()
   if executable_name == "clither" then
     return { "--tests" }
   end
-  return nil
+  return vim.deepcopy(cmake.get_launch_args())
 end
 
 vim.keymap.set("n", "<leader>dr", function()
@@ -176,28 +188,49 @@ vim.keymap.set("n", "<leader>dr", function()
 end)
 
 vim.keymap.set("n", "<leader>dt", function()
-  local suite = find_suite_name()
-  local test = find_test_name()
+  local suite, test = find_test_and_suite_names()
   if not suite or not test then
     error("No tests found")
     return
   end
+  local framework = find_testing_framework()
+  if not framework then
+    error("Could not identify test framework")
+  end
 
   local args = get_program_special_args() or {}
-  table.insert(args, "--gtest_filter=" .. suite .. "." .. test)
+  if framework == "gtest" then
+    table.insert(args, '--gtest_filter="*' .. suite .. "." .. test .. '*"')
+  end
+  if framework == "CppUTest" then
+    table.insert(args, "-sg")
+    table.insert(args, suite)
+    table.insert(args, "-sn")
+    table.insert(args, test)
+  end
 
   run_command_in_gdb(args)
 end)
 
 vim.keymap.set("n", "<leader>ds", function()
-  local suite = find_suite_name()
+  local suite, test = find_test_and_suite_names()
   if not suite then
     error("No tests found")
     return
   end
+  local framework = find_testing_framework()
+  if not framework then
+    error("Could not identify test framework")
+  end
 
   local args = get_program_special_args() or {}
-  table.insert(args, '--gtest_filter="' .. suite .. '.*"')
+  if framework == "gtest" then
+    table.insert(args, '--gtest_filter="*' .. suite .. "." .. test .. '*"')
+  end
+  if framework == "CppUTest" then
+    table.insert(args, "-sg")
+    table.insert(args, suite)
+  end
 
   run_command_in_gdb(args)
 end)
@@ -215,10 +248,10 @@ vim.keymap.set("n", "<leader>db", function()
   local current_line = vim.fn.line(".")
 
   -- Create "break" command and append it to .gdbinit
-  local break_command = string.format("break %s:%d", current_file, current_line)
   local found = false
   for i, command in ipairs(gdb_commands) do
-    if command:match(break_command) then
+    local filename = command:match("break (.+):(%d+)")
+    if filename == current_file then
       table.remove(gdb_commands, i)
       vim.fn.sign_unplace(current_file, { buffer = vim.fn.bufnr("%"), id = current_line })
       found = true
@@ -227,7 +260,7 @@ vim.keymap.set("n", "<leader>db", function()
   end
   if not found then
     vim.fn.sign_place(current_line, current_file, "DebugBreakpoint", vim.fn.bufnr("%"), { lnum = current_line })
-    table.insert(gdb_commands, break_command)
+    table.insert(gdb_commands, string.format("break %s:%d", current_file, current_line))
   end
 
   save_gdbinit(gdb_commands)

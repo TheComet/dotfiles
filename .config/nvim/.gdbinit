@@ -1,15 +1,8 @@
-set history save on
-set history size 10000
-set history filename ~/.gdb_history
+source ~/gdb/mobius_scripts.py
+handle SIGTRAP nostop noprint ignore
 
-python
-import gdb
-import glob
-from os import getenv
-from os.path import join
-
-# Search the python dir for all .py files, and source each
-for fname in glob.glob(join(getenv("HOME"), "gdb-scripts", "*.py")):
-    gdb.execute(f"source {fname}")
-end
-
+skip function Simulation_InstructionCallback
+skip -rfu std::_List_iterator<.*>::.*
+skip -rfu std::allocator<.*>::.*
+skip -rfu std::vector<.*>::.*
+skip -rfu VirtualDevice::.*Event
