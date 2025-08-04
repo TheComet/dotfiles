@@ -260,7 +260,7 @@ vim.keymap.set("n", "<leader>db", function()
   end
   if not found then
     vim.fn.sign_place(current_line, current_file, "DebugBreakpoint", vim.fn.bufnr("%"), { lnum = current_line })
-    table.insert(gdb_commands, string.format("break %s:%d", current_file, current_line))
+    table.insert(gdb_commands, 1, string.format("break %s:%d", current_file, current_line))
   end
 
   save_gdbinit(gdb_commands)

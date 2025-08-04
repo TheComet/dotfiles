@@ -39,7 +39,7 @@ return {
       vim.keymap.set("n", "gC", "<CMD>Lspsaga incoming_calls<CR>")
       vim.keymap.set("n", "go", vim.lsp.buf.type_definition, opts)
       vim.keymap.set("n", "gO", "<CMD>Lspsaga peek_type_declaration<CR>")
-      vim.keymap.set("n", "<M-o>", "<CMD>ClangdSwitchSourceHeader<CR>")
+      vim.keymap.set("n", "<M-o>", "<CMD>LspClangdSwitchSourceHeader<CR>")
       --vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, opts)
       vim.keymap.set("n", "<leader>r", "<CMD>Lspsaga rename<CR>", { silent = true, noremap = true })
       vim.keymap.set("n", "<C-k>", vim.lsp.buf.signature_help, opts)
