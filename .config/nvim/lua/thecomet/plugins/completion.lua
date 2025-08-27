@@ -23,6 +23,7 @@ return {
     require("luasnip.loaders.from_lua").load({
       paths = {
         vim.fn.getcwd() .. "/.nvim/luasnippets",
+        vim.fn.getenv("HOME") .. "/.nvim/luasnippets",
         vim.fn.stdpath("config") .. "/luasnippets",
       },
       fs_event_providers = {

@@ -21,3 +21,4 @@ require("lazy").setup("thecomet.plugins")
 
 -- Local imports
 require("thecomet.ngspice")
+require("thecomet.gdb")
