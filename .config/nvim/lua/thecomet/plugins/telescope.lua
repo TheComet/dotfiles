@@ -53,7 +53,7 @@ return {
     defaults = {
       file_ignore_patterns = {
         "^ShadowOrbot/",
-        "^[Tt]hird[Pp]arty/",
+        --"^[Tt]hird[Pp]arty/",
       }
     },
   },

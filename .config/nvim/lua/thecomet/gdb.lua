@@ -59,7 +59,10 @@ local function find_testing_framework()
     if line:match("#include \"CppUTest/TestHarness%.h") then
       return "CppUTest"
     end
-    if line:match("#include \"gmock/gmock.h") then
+    if line:match("#include [\"<]gmock") then
+      return "gtest"
+    end
+    if line:match("#include [\"<]gtest") then
       return "gtest"
     end
   end
