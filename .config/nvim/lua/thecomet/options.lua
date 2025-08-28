@@ -1,32 +1,34 @@
 -- Why
-vim.opt.guicursor = ""
-vim.opt.mouse = ""
+vim.o.guicursor = ""
+vim.o.mouse = ""
+
+-- Files
+vim.o.swapfile = false
+vim.o.backup = false
+vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.o.undofile = true
+vim.o.termguicolors = true
 
 -- Line numbers and relative numbers
-vim.opt.nu = true
-vim.opt.relativenumber = true
+vim.o.number = true
+vim.o.relativenumber = true
+vim.o.wrap = true
+vim.o.formatoptions = "cqjn"
+vim.o.cursorline = true
+vim.o.scrolloff = 8
+vim.o.signcolumn = "yes"
+vim.o.colorcolumn = "80"
 
--- Don't wrap text, don't insert newlines when I don't want them
-vim.opt.wrap = true
-vim.opt.formatoptions = "cqj"
+-- Search
+vim.o.hlsearch = false
+vim.o.incsearch = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
-
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
-
-vim.opt.termguicolors = true
-vim.opt.cursorline = true
-
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
+-- Misc
 vim.opt.isfname:append("@-@")
-
-vim.opt.updatetime = 50
-vim.opt.colorcolumn = "80"
+vim.o.updatetime = 50
+vim.o.lazyredraw = true
 
 vim.g.mapleader = " "
 
@@ -36,7 +38,6 @@ vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*\\d: %t%*[^:]: %m'
 -- BISON
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c-%*[0-9]: %m'
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
---vim.o.errorformat = vim.o.errorformat .. ',%f: %m'
 -- CMake
 vim.o.errorformat = vim.o.errorformat .. ',CMake Error at %f:%l%.%#'
 -- GTest

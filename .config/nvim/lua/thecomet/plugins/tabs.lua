@@ -10,6 +10,7 @@ local c_tabwidth = hostname == "C017443" and 2 or 4
 
 if hostname == "C017443" then
   vim.opt.colorcolumn = "120"
+  vim.opt.colorcolumn = "120"
 end
 
 return {
@@ -32,6 +33,13 @@ return {
         config = {
           tabwidth = 2,
           expandtab = true,
+        }
+      },
+      {
+        filetypes = { "make" },
+        config = {
+          tabwidth = 4,
+          expandtab = false,
         }
       },
     },

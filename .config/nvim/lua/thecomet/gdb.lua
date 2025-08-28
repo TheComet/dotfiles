@@ -209,11 +209,11 @@ vim.keymap.set("n", "<leader>dr", function()
 end)
 
 vim.keymap.set("n", "<leader>da", function()
-  local new_args = vim.fn.input("Args: ", table.concat(last_run_args, " "))
-  if new_args == nil then
-    return
-  end
-  run_command_in_gdb(vim.split(new_args, " +"))
+  vim.ui.input({ prompt = "Args: ", default = table.concat(last_run_args, " ")}, function(args)
+    if args ~= nil then
+      run_command_in_gdb(vim.split(args, " +"))
+    end
+  end)
 end)
 
 vim.keymap.set("n", "<leader>dt", function()
