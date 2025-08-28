@@ -17,7 +17,12 @@ local function determine_compile_commands_dir()
 end
 
 local function create_clangd_cmd()
-  local cmd = {"clangd", "--clang-tidy", "--background-index", "--header-insertion=never",} 
+  local cmd = {
+    "clangd",
+    "--clang-tidy",
+    "--background-index",
+    "--header-insertion=never",
+  }
   local compile_commands_dir = determine_compile_commands_dir()
   if compile_commands_dir ~= nil then
     table.insert(cmd, "--compile-commands-dir=" .. compile_commands_dir)
@@ -134,3 +139,30 @@ vim.api.nvim_create_autocmd("LspAttach", {
     vim.keymap.set({ "n", "v" }, "<leader>f", vim.lsp.buf.format, opts) --function()
   end
 })
+
+vim.diagnostic.config({
+  virtual_text = false,
+  virtual_lines = true,
+  signs = true,
+  underline = true,
+  update_in_insert = false,
+})
+
+local cycle_diagnostics = 1
+vim.keymap.set("n", "<Leader>dd", vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<leader>dv", function()
+  if cycle_diagnostics == 0 then
+    vim.diagnostic.config({ virtual_lines = true, virtual_text = false })
+    cycle_diagnostics = 1
+  elseif cycle_diagnostics == 1 then
+    vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
+    cycle_diagnostics = 2
+  else
+    vim.diagnostic.config({ virtual_lines = false, virtual_text = false })
+    cycle_diagnostics = 0
+  end
+end, { desc = "Toggle diagnostics virtual text" })
+
+
