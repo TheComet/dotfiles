@@ -12,7 +12,7 @@ return {
         --             ${kitGenerator}
         --             ${variant:xx}
         cmake_build_directory = "build-${variant:buildType}",
-        cmake_soft_link_compile_commands = true,
+        cmake_soft_link_compile_commands = false,
         cmake_compile_commands_from_lsp = false,
         cmake_kits_path = nil, -- this is used to specify global cmake kits path, see CMakeKits for detailed usage
         cmake_variants_message = {

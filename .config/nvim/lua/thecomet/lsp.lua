@@ -141,8 +141,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 })
 
 vim.diagnostic.config({
-  virtual_text = false,
-  virtual_lines = true,
+  virtual_text = true,
+  virtual_lines = false,
   signs = true,
   underline = true,
   update_in_insert = false,
@@ -157,10 +157,10 @@ vim.keymap.set("n", "<leader>dv", function()
     vim.diagnostic.config({ virtual_lines = true, virtual_text = false })
     cycle_diagnostics = 1
   elseif cycle_diagnostics == 1 then
-    vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
+    vim.diagnostic.config({ virtual_lines = false, virtual_text = false })
     cycle_diagnostics = 2
   else
-    vim.diagnostic.config({ virtual_lines = false, virtual_text = false })
+    vim.diagnostic.config({ virtual_lines = false, virtual_text = true })
     cycle_diagnostics = 0
   end
 end, { desc = "Toggle diagnostics virtual text" })

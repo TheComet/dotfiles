@@ -29,7 +29,7 @@ return {
         }
       },
       {
-        filetypes = { "json", "nix", "lua" },
+        filetypes = { "json", "nix", "lua", ".s", ".asm" },
         config = {
           tabwidth = 2,
           expandtab = true,
