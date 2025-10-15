@@ -7,6 +7,7 @@ set pagination off
 set auto-load local-gdbinit on
 set auto-load safe-path /
 set auto-load python-scripts on
+set breakpoint pending on
 
 source ~/.gdbinit
 
