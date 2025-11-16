@@ -36,51 +36,67 @@ cpp_snippets = {
   }),
 }
 
+local function dynamic_printf(values)
+  local fmt_string = values[1][1]
+  local nodes = {}
+  for _ in fmt_string:gmatch("%%[^%%]") do
+    local idx = #nodes / 2 + 1
+    table.insert(nodes, t(", "))
+    table.insert(nodes, r(idx, "arg" .. idx, i(nil, "arg" .. idx)))
+  end
+  return sn(1, nodes)
+end
+
 c_and_cpp_snippets = {
+  s({ trig = "split", docstring = "/* --- */" }, {
+    t("/* -------------------------------------------------------------------------- */")
+  }),
   s({ trig = "cpp", docstring = "C++ extern #define" },
     fmt("#if defined(__cplusplus)\n{}\n#endif\n", {
       c(1, { i(1, "extern \"C\" {"), i(2, "}"), })
     })
   ),
-  s({ trig = "fprintf", docstring = "fprintf" }, {
-    t("fprintf("),
-    c(1, { i(1, "stderr"), i(2, "fp"), }),
-    t(', "'), i(2, ""), t('\\n"'),
-    d(3, function(values)
-      local fmt_string = values[1][1]
-      local nodes = {}
-      for _ in fmt_string:gmatch("%%[^%%]") do
-        local idx = #nodes / 2 + 1
-        table.insert(nodes, t(", "))
-        table.insert(nodes, r(idx, "arg" .. idx, i(nil, "arg" .. idx)))
-      end
-      return sn(1, nodes)
-    end, { 2 }),
-    t(");"),
-  }, {
-    stored = {},
-  }),
 
-  s({ trig = "printf", docstring = "printf" }, {
-    t('printf("'),
-    i(1, ""), t('\\n"'),
-    d(2, function(values)
-      local fmt_string = values[1][1]
-      local nodes = {}
-      for _ in fmt_string:gmatch("%%[^%%]") do
-        local idx = #nodes / 2 + 1
-        table.insert(nodes, t(", "))
-        table.insert(nodes, r(idx, "arg" .. idx, i(nil, "arg" .. idx)))
-      end
-      return sn(1, nodes)
-    end, { 1 }),
-    t(");"),
-  }, {
-    stored = {},
-  }),
+  s({ trig = "fprintf", docstring = "fprintf" },
+    fmt('fprintf({}, "{}\\n"{});', {
+      c(1, { i(1, "stderr"), i(2, "fp"), }),
+      i(2, ""),
+      d(3, dynamic_printf, { 2 }),
+    }, { stored = {} })
+  ),
+  s({ trig = "printf", docstring = "printf" },
+    fmt('printf("{}\\n"{});', {
+      i(1, ""),
+      d(2, dynamic_printf, { 1 }),
+    }, { stored = {} })
+  ),
+
+  s({ trig = "for", docstring = "index based for-loop" },
+    fmt("for({} {} = 0; {} != {}; ++{})", {
+      i(1, "int"),
+      i(2, "i"),
+      rep(2),
+      i(3, "count"),
+      rep(2),
+    })
+  ),
 }
 
-ls.add_snippets("c", c_snippets, { key = "thecomet-c" })
-ls.add_snippets("cpp", cpp_snippets, { key = "thecomet-cpp" })
-ls.add_snippets("c", c_and_cpp_snippets, { key = "thecomet-c" })
-ls.add_snippets("cpp", c_and_cpp_snippets, { key = "thecomet-cpp" })
+local function join_tables(...)
+  local result = {}
+  for _, t in ipairs({...}) do
+    for _, v in ipairs(t) do
+      table.insert(result, v)
+    end
+  end
+  return result
+end
+
+ls.add_snippets("c", join_tables(
+  c_snippets,
+  c_and_cpp_snippets
+), { key = "thecomet-c" })
+ls.add_snippets("cpp", join_tables(
+  cpp_snippets,
+  c_and_cpp_snippets
+), { key = "thecomet-cpp" })
