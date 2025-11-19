@@ -99,6 +99,14 @@ vim.lsp.enable({
   "luals",
 })
 
+vim.api.nvim_create_user_command("ClangdStop", function(opts)
+  for _, client in pairs(vim.lsp.get_clients()) do
+    if client.name == "clangd" then
+      client:stop()
+    end
+  end
+end, { })
+
 vim.api.nvim_create_user_command("ClangdRestart", function(opts)
   for _, client in pairs(vim.lsp.get_clients()) do
     if client.name == "clangd" then

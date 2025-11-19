@@ -40,6 +40,8 @@ return {
       -- Update as you type (in dynamic snippets)
       updateevents = "TextChanged,TextChangedI",
 
+      enable_autosnippets = true,
+
       -- Fix issue where pressing tab somewhere else after aborting
       -- completion teleports your cursor back to where the last
       -- completion took place
