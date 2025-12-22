@@ -56,7 +56,7 @@ local function dynamic_printf(values)
 end
 
 c_and_cpp_snippets = {
-  s({ trig = "split", docstring = "/* --- */" }, {
+  s({ trig = "sep", docstring = "/* --- */" }, {
     t("/* -------------------------------------------------------------------------- */")
   }),
   s({ trig = "cpp", docstring = "C++ extern #define" },
@@ -93,14 +93,13 @@ c_and_cpp_snippets = {
       rep(2),
       i(3, "count"),
       rep(2),
+    })
+  ),
 
   s({ trig = "sc", docstring = "static_cast" },
     fmt("static_cast<{}>({})", {
       i(1, "type"),
       i(2, "value"),
-    })
-  ),
-
     })
   ),
 }
@@ -246,10 +245,10 @@ end
 
 ls.add_snippets("c", join_tables(
   c_snippets,
-  c_and_cpp_snippets,
+  c_and_cpp_snippets
 ), { key = "thecomet-c" })
 ls.add_snippets("cpp", join_tables(
   cpp_snippets,
   c_and_cpp_snippets,
-  gmock_snippets,
+  gmock_snippets
 ), { key = "thecomet-cpp" })
