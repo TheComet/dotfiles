@@ -1,13 +1,50 @@
 local last_run_args = {}
+makefile = require("thecomet.makefile")
 
 vim.fn.sign_define("DebugBreakpoint", {
   text = "⦿",
   priority = 50,
 })
 
+local function is_cmake_project()
+  if vim.fn.filereadable(vim.loop.cwd() .. "/CMakeLists.txt") ~= 0 then
+    local status, cmake = pcall(require, "cmake-tools")
+    if status then
+      return cmake
+    end
+  end
+end
+
+local function get_executable_name()
+  local cmake = is_cmake_project()
+  if cmake then
+    return cmake.get_launch_target()
+  end
+  return makefile.get_executable_name()
+end
+
+local function get_executable_file_path()
+  local cmake = is_cmake_project()
+  if cmake then
+    return cmake.get_launch_target_path()
+  end
+
+  local makefile_exe = makefile.get_executable_name()
+  if makefile_exe then
+    return vim.loop.cwd() .. "/" .. makefile_exe
+  end
+end
+
+local function get_program_special_args()
+  local cmake = is_cmake_project()
+  if cmake then
+    return vim.deepcopy(cmake.get_launch_args())
+  end
+  return {}
+end
+
 local function gdbinit_filepath()
-  local cmake = require("cmake-tools")
-  local executable = cmake.get_launch_target_path()
+  local executable = get_executable_file_path()
   if not executable then
     return nil
   end
@@ -66,7 +103,6 @@ local function find_testing_framework()
       return "gtest"
     end
   end
-  return nil
 end
 
 local function find_suite_define()
@@ -80,7 +116,6 @@ local function find_suite_define()
       return suite
     end
   end
-  return nil
 end
 
 local function find_test_and_suite_names()
@@ -98,13 +133,11 @@ local function find_test_and_suite_names()
       return suite, test
     end
   end
-  return nil
 end
 
 local function run_command_in_gdb(args)
   last_run_args = args
-  local cmake = require("cmake-tools")
-  local executable = cmake.get_launch_target_path()
+  local executable = get_executable_file_path()
   if not executable then
     error("No executable found. Please configure the project first (using cmake-tools).")
     return
@@ -124,15 +157,6 @@ local function run_command_in_gdb(args)
   vim.cmd("wincmd h")
 end
 
-local function get_program_special_args()
-  local cmake = require("cmake-tools")
-  local executable_name = cmake.get_launch_target()
-  if executable_name == "clither" then
-    return { "--tests" }
-  end
-  return vim.deepcopy(cmake.get_launch_args())
-end
-
 local function get_breakpoint_sign_on_line(bufnr, current_file, current_line)
   local placed = vim.fn.sign_getplaced(bufnr, {
     group = current_file,
@@ -145,7 +169,6 @@ local function get_breakpoint_sign_on_line(bufnr, current_file, current_line)
       end
     end
   end
-  return nil
 end
 
 local function toggle_breakpoint()

@@ -135,18 +135,24 @@ return {
         cmake_virtual_text_support = true, -- Show the target related to current file using virtual text (at right corner)
     },
     keys = {
-        { "<leader>cc", "<CMD>CMakeClean<CR>" },
+        --{ "<leader>cc", "<CMD>CMakeClean<CR>" },
         { "<leader>cg", "<CMD>CMakeGenerate<CR>" },
-        { "<leader>cb", "<CMD>CMakeBuild<CR>" },
+        --{ "<leader>cb", "<CMD>CMakeBuild<CR>" },
         { "<leader>ctt", "<CMD>CMakeSelectLaunchTarget<CR>" },
         { "<leader>cts", "<CMD>CMakeTargetSettings<CR>" },
         { "<leader>ctb", "<CMD>CMakeSelectBuildDir<CR>" },
         { "<leader>ctc", "<CMD>CMakeSelectCwd<CR>" },
-        { "<leader>cr", "<CMD>CMakeRun<CR>" },
+        --{ "<leader>cr", "<CMD>CMakeRun<CR>" },
         { "<leader>cs", "<CMD>CMakeSettings<CR>" },
         { "<leader>cx", "<CMD>CMakeStopExecutor<CR>" },
     },
     config = function(_, opts)
         require("cmake-tools").setup(opts)
+        local cmake_file = vim.fn.expand("%:p:h") .. "/CMakeLists.txt"
+        if vim.fn.filereadable(cmake_file) ~= 0 then
+            vim.keymap.set("n", "<leader>cb", "<CMD>CMakeBuild<CR>")
+            vim.keymap.set("n", "<leader>cc", "<CMD>CMakeClean<CR>")
+            vim.keymap.set("n", "<leader>cr", "<CMD>CMakeRun<CR>")
+        end
     end
 }

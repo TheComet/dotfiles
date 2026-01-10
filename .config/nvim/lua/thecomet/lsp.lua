@@ -13,7 +13,32 @@ end
 local function determine_compile_commands_dir()
   local status, cmake = pcall(require, "cmake-tools")
   if not status then return nil end
-  return tostring(cmake.get_build_directory())
+  local dir = tostring(cmake.get_build_directory())
+  if vim.fn.filereadable(dir .. "/compile_commands.json") == 0 then return nil end
+  return dir
+end
+
+local function write_clangd_config_from_makefile()
+  variables = makefile.collect_variables()
+  if not variables then return end
+
+  local clangd_file = io.open(vim.loop.cwd() .. "/.clangd", "w")
+  if not clangd_file then
+    return
+  end
+  clangd_file:write("CompileFlags:\n  Add:\n")
+
+  local flags_to_check = { "CFLAGS", "CXXFLAGS" }
+  for _, flag_var in ipairs(flags_to_check) do
+    local values = variables[flag_var]
+    if values then
+      for _, value in ipairs(values) do
+        clangd_file:write('    - "' .. value .. '"\n')
+      end
+    end
+  end
+
+  clangd_file:close()
 end
 
 local function create_clangd_cmd()
@@ -23,10 +48,14 @@ local function create_clangd_cmd()
     "--background-index",
     "--header-insertion=never",
   }
+
   local compile_commands_dir = determine_compile_commands_dir()
-  if compile_commands_dir ~= nil then
+  if compile_commands_dir then
     table.insert(cmd, "--compile-commands-dir=" .. compile_commands_dir)
+  else
+    write_clangd_config_from_makefile()
   end
+
   return cmd
 end
 

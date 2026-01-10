@@ -33,3 +33,32 @@ vim.keymap.set("n", "gp", "`[v`]")
 -- Toggle relative/absolute line numbers
 vim.keymap.set("n", "<leader>l", "<CMD>set relativenumber!<CR>")
 
+-- Default to :make. cmake.nvim will override this if it detects a CMakeLists.txt
+local function default_build()
+    vim.cmd("wa")
+    vim.cmd("copen")
+    vim.cmd("silent make")
+    local qflist = vim.fn.getqflist()
+    local has_errors = false
+    for _, item in ipairs(qflist) do
+        if item.valid and item.bufnr ~= 0 then
+            has_errors = true
+            break
+        end
+    end
+    if not has_errors then
+        vim.cmd('cclose')
+        print("Compilation succeeded!")
+    end
+end
+vim.keymap.set("n", "<leader>cc", function()
+  vim.cmd("silent make clean")
+end)
+vim.keymap.set("n", "<leader>cr", function()
+  local make = require("thecomet.makefile")
+  local exe = make.get_executable_name()
+  if not exe then return end
+  default_build()
+  vim.system({"./" .. exe}, {cwd = vim.loop.cwd()})
+end)
+vim.keymap.set("n", "<leader>cb", default_build, { noremap = true, silent = true })

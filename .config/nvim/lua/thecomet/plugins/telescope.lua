@@ -54,7 +54,7 @@ return {
       file_ignore_patterns = {
         "^ShadowOrbot/",
         --"^[Tt]hird[Pp]arty/",
-      }
+      },
     },
   },
   config = function(_, opts)
