@@ -54,11 +54,34 @@ end
 vim.keymap.set("n", "<leader>cc", function()
   vim.cmd("silent make clean")
 end)
+local last_run_command = ""
 vim.keymap.set("n", "<leader>cr", function()
-  local make = require("thecomet.makefile")
-  local exe = make.get_executable_name()
-  if not exe then return end
   default_build()
-  vim.system({"./" .. exe}, {cwd = vim.loop.cwd()})
+  if last_run_command == "" then
+    local make = require("thecomet.makefile")
+    local exe = make.get_executable_name()
+    if exe then last_run_command = "./" .. exe end
+  end
+  vim.ui.input({
+      prompt = "Command: ",
+      default = last_run_command
+    }, function(args)
+    if args ~= nil then
+      local update_qflist = function(err, data)
+        vim.schedule(function()
+          if data then
+            vim.fn.setqflist({}, "a", { lines = vim.split(data, "\n") })
+          end
+        end)
+      end
+      last_run_command = args
+      vim.system({"sh", "-c", last_run_command}, {
+        text = true,
+        cwd = vim.loop.cwd(),
+        stdout = update_qflist,
+        stderr = update_qflist,
+      })
+    end
+  end)
 end)
 vim.keymap.set("n", "<leader>cb", default_build, { noremap = true, silent = true })
