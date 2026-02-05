@@ -51,10 +51,16 @@ vim.api.nvim_create_autocmd("BufRead", {
   end,
 })
 
--- GLSL filetypes
+-- filetypes
 vim.api.nvim_create_autocmd("BufRead", {
   pattern = "*.[fv]sh",
   callback = function()
     vim.bo.filetype = "glsl"
+  end,
+})
+vim.api.nvim_create_autocmd("BufRead", {
+  pattern = "*.dba",
+  callback = function()
+    vim.bo.filetype = "basic"
   end,
 })

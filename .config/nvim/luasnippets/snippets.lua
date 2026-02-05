@@ -87,12 +87,8 @@ c_and_cpp_snippets = {
   ),
 
   s({ trig = "for", docstring = "index based for-loop" },
-    fmt("for({} {} = 0; {} != {}; ++{})", {
-      i(1, "int"),
-      i(2, "i"),
-      rep(2),
-      i(3, "count"),
-      rep(2),
+    fmt("for({} = 0; {} != {}; ++{})", {
+      i(1, "i"), rep(1), i(2, "count"), rep(1),
     })
   ),
 
