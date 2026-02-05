@@ -7,7 +7,9 @@ vim.fn.sign_define("DebugBreakpoint", {
 })
 
 local function is_cmake_project()
-  if vim.fn.filereadable(vim.loop.cwd() .. "/CMakeLists.txt") ~= 0 then
+  local cmake_file = vim.loop.cwd() .. "/CMakeLists.txt"
+  local other_cmake_file = vim.loop.cwd() .. "/Sonic/CMakeLists.txt" 
+  if vim.fn.filereadable(cmake_file) ~= 0 or vim.fn.filereadable(other_cmake_file) ~= 0 then
     local status, cmake = pcall(require, "cmake-tools")
     if status then
       return cmake
@@ -20,7 +22,12 @@ local function get_executable_name()
   if cmake then
     return cmake.get_launch_target()
   end
-  return makefile.get_executable_name()
+  if makefile.exists() then
+    local all = makefile.all_targets()
+    local vars = makefile.collect_variables()
+    local target = makefile.expand_vars(all[1], vars)
+    return target
+  end
 end
 
 local function get_executable_file_path()
@@ -29,7 +36,7 @@ local function get_executable_file_path()
     return cmake.get_launch_target_path()
   end
 
-  local makefile_exe = makefile.get_executable_name()
+  local makefile_exe = get_executable_name()
   if makefile_exe then
     return vim.loop.cwd() .. "/" .. makefile_exe
   end

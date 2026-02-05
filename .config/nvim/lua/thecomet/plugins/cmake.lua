@@ -149,7 +149,8 @@ return {
     config = function(_, opts)
         require("cmake-tools").setup(opts)
         local cmake_file = vim.fn.expand("%:p:h") .. "/CMakeLists.txt"
-        if vim.fn.filereadable(cmake_file) ~= 0 then
+        local other_cmake_file = vim.fn.expand("%:p:h") .. "/Sonic/CMakeLists.txt"
+        if vim.fn.filereadable(cmake_file) ~= 0 or vim.fn.filereadable(other_cmake_file) ~= 0 then
             vim.keymap.set("n", "<leader>cb", "<CMD>CMakeBuild<CR>")
             vim.keymap.set("n", "<leader>cc", "<CMD>CMakeClean<CR>")
             vim.keymap.set("n", "<leader>cr", "<CMD>CMakeRun<CR>")

@@ -10,7 +10,7 @@ local function find_project_root(patterns)
   return vim.fn.fnamemodify(root, ':h')
 end
 
-local function determine_compile_commands_dir()
+local function determine_cmake_compile_commands_dir()
   local status, cmake = pcall(require, "cmake-tools")
   if not status then return nil end
   local dir = tostring(cmake.get_build_directory())
@@ -18,27 +18,72 @@ local function determine_compile_commands_dir()
   return dir
 end
 
-local function write_clangd_config_from_makefile()
-  variables = makefile.collect_variables()
-  if not variables then return end
-
-  local clangd_file = io.open(vim.loop.cwd() .. "/.clangd", "w")
-  if not clangd_file then
+local function write_compile_commands_from_makefile(build_dir)
+   local result = vim.system(
+    { "make", "-BnrR" },
+    { text = true }
+  ):wait()
+  if result.code ~= 0 then
+    vim.notify("make -n failed", vim.log.levels.ERROR)
     return
   end
-  clangd_file:write("CompileFlags:\n  Add:\n")
 
-  local flags_to_check = { "CFLAGS", "CXXFLAGS" }
-  for _, flag_var in ipairs(flags_to_check) do
-    local values = variables[flag_var]
-    if values then
-      for _, value in ipairs(values) do
-        clangd_file:write('    - "' .. value .. '"\n')
+  local lines = vim.split(result.stdout, "\n", { trimempty = true })
+
+  -- 1. Reconstruct wrapped commands
+  local commands = {}
+  local current = nil
+
+  for _, line in ipairs(lines) do
+    if line:match("^%s") then
+      -- continuation line
+      if current then
+        current = current .. " " .. vim.trim(line)
+      end
+    else
+      if current then
+        table.insert(commands, current)
+      end
+      current = line
+    end
+  end
+
+  if current then
+    table.insert(commands, current)
+  end
+
+  local compile_commands = {}
+  local cwd = vim.loop.cwd()
+
+  -- 2. Extract compiler commands
+  for _, cmd in ipairs(commands) do
+    -- must contain -c and -o something.o
+    if (cmd:match("%s%-c%s") or cmd:match("%s%-c$")) and cmd:match("%s%-o%s+[^%s]+%.o") then
+      -- extract source file (argument to -c)
+      local src = cmd:match("%s(%S+%.c[cpx]*)%s")
+      local output = cmd:match("%s%-o%s(%S+.c[cpx]*%S+)")
+      if src and output then
+        table.insert(compile_commands, {
+          directory = cwd,
+          command = cmd,
+          file = src,
+          output = output,
+        })
       end
     end
   end
 
-  clangd_file:close()
+  if #compile_commands == 0 then
+    vim.notify("No compiler commands found", vim.log.levels.WARN)
+    return
+  end
+
+  -- 3. Write compile_commands.json
+  vim.fn.mkdir(build_dir, "p")
+  local out = build_dir .. "/compile_commands.json"
+
+  local json = vim.json.encode(compile_commands, { indent="  " })
+  vim.fn.writefile(vim.split(json, "\n"), out)
 end
 
 local function create_clangd_cmd()
@@ -49,11 +94,21 @@ local function create_clangd_cmd()
     "--header-insertion=never",
   }
 
-  local compile_commands_dir = determine_compile_commands_dir()
+  local compile_commands_dir = determine_cmake_compile_commands_dir()
   if compile_commands_dir then
     table.insert(cmd, "--compile-commands-dir=" .. compile_commands_dir)
-  else
-    write_clangd_config_from_makefile()
+    return cmd
+  end
+
+  if makefile.exists() then
+    local all = makefile.all_targets()
+    local vars = makefile.collect_variables()
+    local target = makefile.expand_vars(all[1], vars)
+    local build_dir = vim.fs.dirname(target)
+    local compile_commands = build_dir .. "/compile_commands.json"
+    write_compile_commands_from_makefile(build_dir)
+    table.insert(cmd, "--compile-commands-dir=" .. build_dir)
+    return cmd
   end
 
   return cmd
