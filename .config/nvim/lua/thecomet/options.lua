@@ -25,6 +25,9 @@ vim.o.incsearch = true
 vim.o.ignorecase = true
 vim.o.smartcase = true
 
+-- Make with threads by default
+vim.o.makeprg = "make -j32"
+
 -- Misc
 vim.opt.isfname:append("@-@")
 vim.o.updatetime = 50
