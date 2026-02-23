@@ -17,17 +17,16 @@ local function is_cmake_project()
   end
 end
 
-local function get_executable_name()
-  local cmake = is_cmake_project()
-  if cmake then
-    return cmake.get_launch_target()
+local function get_makefile_targets()
+  local targets = {}
+  local vars = makefile.collect_variables()
+  for _, target in ipairs(makefile.all_targets()) do
+    table.insert(targets, makefile.expand_vars(target, vars))
   end
-  if makefile.exists() then
-    local all = makefile.all_targets()
-    local vars = makefile.collect_variables()
-    local target = makefile.expand_vars(all[1], vars)
-    return target
+  for _, target in ipairs(makefile.test_targets()) do
+    table.insert(targets, makefile.expand_vars(target, vars))
   end
+  return targets
 end
 
 local function get_executable_file_path()
@@ -36,9 +35,9 @@ local function get_executable_file_path()
     return cmake.get_launch_target_path()
   end
 
-  local makefile_exe = get_executable_name()
-  if makefile_exe then
-    return vim.loop.cwd() .. "/" .. makefile_exe
+  if makefile.exists() then
+    local targets = get_makefile_targets()
+    if #targets > 0 then return vim.loop.cwd() .. "/" .. targets[1] end
   end
 end
 
@@ -142,17 +141,11 @@ local function find_test_and_suite_names()
   end
 end
 
-local function run_command_in_gdb(args)
-  last_run_args = args
-  local executable = get_executable_file_path()
-  if not executable then
-    error("No executable found. Please configure the project first (using cmake-tools).")
-    return
-  end
-  local working_dir = vim.fs.dirname(executable)
-  local command = string.format("tmux split-window -c %s -h 'gdb --args %s %s'",
+local function execute_gdb_in_tmux(executable_filepath, args)
+  local working_dir = vim.fs.dirname(executable_filepath)
+  local command = string.format("tmux split-window -l 30%% -v -c %s 'gdb --args %s %s'",
     working_dir,
-    executable,
+    executable_filepath,
     args and table.concat(args, " ") or "")
 
   local sock = "/tmp/gdb-nvim.sock"
@@ -162,6 +155,32 @@ local function run_command_in_gdb(args)
 
   vim.fn.system(command)
   vim.cmd("wincmd h")
+end
+
+local function run_command_in_gdb(args)
+  last_run_args = args
+
+  local cmake = is_cmake_project()
+  if cmake then
+    return execute_gdb_in_tmux(cmake.get_launch_target_path())
+  end
+
+  if makefile.exists() then
+    local targets = get_makefile_targets()
+    if #targets == 1 then
+      return execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. targets[1])
+    end
+    if #targets > 1 then
+      vim.ui.select(targets, { prompt = "Select target to debug" }, function(choice)
+        if choice then
+          execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. choice)
+        end
+      end)
+      return
+    end
+  end
+  
+  error("No executable found. Please configure the project first (using cmake-tools).")
 end
 
 local function get_breakpoint_sign_on_line(bufnr, current_file, current_line)

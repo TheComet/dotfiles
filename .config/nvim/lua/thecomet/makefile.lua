@@ -26,6 +26,23 @@ local function all_targets()
   end
 end
 
+local function test_targets()
+  local makefile = makefile_path()
+  if not makefile then return end
+  local lines = vim.fn.readfile(makefile)
+  for _, line in ipairs(lines) do
+    line = line:gsub("#.*$", "") -- strip comments
+    local targets = line:match("^test%s*:%s*(.+)$")
+    if targets then
+      local result = {}
+      for t in targets:gmatch("%S+") do
+        table.insert(result, t)
+      end
+      return result
+    end
+  end
+end
+
 local function expand_vars(str, vars)
   return (str:gsub("%$%(([%w_]+)%)", function(name)
     local val = vars[name]
@@ -89,6 +106,7 @@ end
 return {
   exists = makefile_exists,
   all_targets = all_targets,
+  test_targets = test_targets,
   collect_variables = collect_variables,
   expand_vars = expand_vars,
 }
