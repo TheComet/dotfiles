@@ -35,21 +35,32 @@ vim.keymap.set("n", "<leader>l", "<CMD>set relativenumber!<CR>")
 
 -- Default to :make. cmake.nvim will override this if it detects a CMakeLists.txt
 local function default_build()
-    vim.cmd("wa")
-    vim.cmd("copen")
-    vim.cmd("silent make")
-    local qflist = vim.fn.getqflist()
-    local has_errors = false
-    for _, item in ipairs(qflist) do
-        if item.valid and item.bufnr ~= 0 then
-            has_errors = true
-            break
+  vim.cmd("wa")
+  local curwin = vim.api.nvim_get_current_win()
+  vim.cmd("copen")
+  vim.api.nvim_set_current_win(curwin)
+  vim.notify("Running make…", vim.log.levels.INFO)
+  on_data = function(_, data)
+    vim.fn.setqflist({}, 'a', { lines = data })
+  end
+  vim.fn.setqflist({}, 'r')
+  vim.fn.jobstart(vim.o.makeprg, {
+    --stdout_buffered = true,
+    --stderr_buffered = true,
+    on_stdout = on_data,
+    on_stderr = on_data,
+    on_exit = function(_, code)
+      vim.schedule(function()
+        if code == 0 then
+          vim.notify("Make successful!", vim.log.levels.INFO)
+          vim.cmd("cclose")
+        else
+          vim.notify("Make failed (exit code " .. code .. ")", vim.log.levels.ERROR)
+          vim.cmd("silent cc 1")
         end
-    end
-    if not has_errors then
-        vim.cmd('cclose')
-        print("Compilation succeeded!")
-    end
+      end)
+    end,
+  })
 end
 vim.keymap.set("n", "<leader>cc", function()
   vim.cmd("silent make clean")
