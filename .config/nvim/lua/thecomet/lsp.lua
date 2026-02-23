@@ -20,12 +20,18 @@ end
 
 local function write_compile_commands_from_makefile(build_dir)
    local result = vim.system(
-    { "make", "-BnrR" },
+    { "make", "-BnrR", "test" },
     { text = true }
   ):wait()
   if result.code ~= 0 then
-    vim.notify("make -n failed", vim.log.levels.ERROR)
-    return
+    result = vim.system(
+      { "make", "-BnrR" },
+      { text = true }
+    ):wait()
+    if result.code ~= 0 then
+      vim.notify("make -n failed", vim.log.levels.ERROR)
+      return
+    end
   end
 
   local lines = vim.split(result.stdout, "\n", { trimempty = true })
