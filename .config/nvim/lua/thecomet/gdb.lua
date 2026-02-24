@@ -162,18 +162,18 @@ local function run_command_in_gdb(args)
 
   local cmake = is_cmake_project()
   if cmake then
-    return execute_gdb_in_tmux(cmake.get_launch_target_path())
+    return execute_gdb_in_tmux(cmake.get_launch_target_path(), args)
   end
 
   if makefile.exists() then
     local targets = get_makefile_targets()
     if #targets == 1 then
-      return execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. targets[1])
+      return execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. targets[1], args)
     end
     if #targets > 1 then
       vim.ui.select(targets, { prompt = "Select target to debug" }, function(choice)
         if choice then
-          execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. choice)
+          execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. choice, args)
         end
       end)
       return
