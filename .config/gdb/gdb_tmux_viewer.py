@@ -93,7 +93,8 @@ class TmuxViewerHook(gdb.Command):
                 self.tmux_controller = TmuxPaneController()
             self.tmux_controller.jump_to(filename, lineno)
         except Exception as e:
-            gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
+            #gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
+            pass
 
 
     def on_stop(self, event):
