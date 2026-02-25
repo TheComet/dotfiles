@@ -1,4 +1,5 @@
 local last_run_args = {}
+local last_run_target = nil
 makefile = require("thecomet.makefile")
 
 vim.fn.sign_define("DebugBreakpoint", {
@@ -141,7 +142,7 @@ local function find_test_and_suite_names()
   end
 end
 
-local function execute_gdb_in_tmux(executable_filepath, args)
+local function run_gdb_in_tmux(executable_filepath, args)
   local working_dir = vim.fs.dirname(executable_filepath)
   local command = string.format("tmux split-window -l 30%% -v -c %s 'gdb --args %s %s'",
     working_dir,
@@ -157,23 +158,23 @@ local function execute_gdb_in_tmux(executable_filepath, args)
   vim.cmd("wincmd h")
 end
 
-local function run_command_in_gdb(args)
-  last_run_args = args
-
+local function select_target()
   local cmake = is_cmake_project()
   if cmake then
-    return execute_gdb_in_tmux(cmake.get_launch_target_path(), args)
+    last_run_target = cmake.get_launch_target_path()
+    return
   end
 
   if makefile.exists() then
     local targets = get_makefile_targets()
     if #targets == 1 then
-      return execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. targets[1], args)
+      last_run_target = vim.loop.cwd() .. "/" .. targets[1]
+      return
     end
     if #targets > 1 then
       vim.ui.select(targets, { prompt = "Select target to debug" }, function(choice)
         if choice then
-          execute_gdb_in_tmux(vim.loop.cwd() .. "/" .. choice, args)
+          last_run_target = vim.loop.cwd() .. "/" .. choice
         end
       end)
       return
@@ -181,6 +182,17 @@ local function run_command_in_gdb(args)
   end
   
   error("No executable found. Please configure the project first (using cmake-tools).")
+end
+
+local function run_last_target_in_gdb(args)
+  last_run_args = args
+  if not last_run_target then
+    select_target()
+    -- async case
+    if not last_run_target then return end
+  end
+
+  run_gdb_in_tmux(last_run_target, last_run_args)
 end
 
 local function get_breakpoint_sign_on_line(bufnr, current_file, current_line)
@@ -252,15 +264,18 @@ vim.keymap.set("n", "<leader>db", function()
 end)
 
 vim.keymap.set("n", "<leader>dr", function()
-  local cmake = require("cmake-tools")
-  local args = cmake.get_launch_args()
-  run_command_in_gdb(args)
+  local args = {}
+
+  local cmake = is_cmake_project()
+  if cmake then args = cmake.get_launch_args() end
+
+  run_last_target_in_gdb(args)
 end)
 
 vim.keymap.set("n", "<leader>da", function()
   vim.ui.input({ prompt = "Args: ", default = table.concat(last_run_args, " ")}, function(args)
     if args ~= nil then
-      run_command_in_gdb(vim.split(args, " +"))
+      run_last_target_in_gdb(vim.split(args, " +"))
     end
   end)
 end)
@@ -287,7 +302,7 @@ vim.keymap.set("n", "<leader>dt", function()
     table.insert(args, test)
   end
 
-  run_command_in_gdb(args)
+  run_last_target_in_gdb(args)
 end)
 
 vim.keymap.set("n", "<leader>ds", function()
@@ -310,7 +325,11 @@ vim.keymap.set("n", "<leader>ds", function()
     table.insert(args, suite)
   end
 
-  run_command_in_gdb(args)
+  run_last_target_in_gdb(args)
+end)
+
+vim.keymap.set("n", "<leader>ctt", function()
+  select_target()
 end)
 
 vim.api.nvim_create_autocmd("BufWritePost", {

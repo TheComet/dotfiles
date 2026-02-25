@@ -138,7 +138,6 @@ return {
         --{ "<leader>cc", "<CMD>CMakeClean<CR>" },
         { "<leader>cg", "<CMD>CMakeGenerate<CR>" },
         --{ "<leader>cb", "<CMD>CMakeBuild<CR>" },
-        { "<leader>ctt", "<CMD>CMakeSelectLaunchTarget<CR>" },
         { "<leader>cts", "<CMD>CMakeTargetSettings<CR>" },
         { "<leader>ctb", "<CMD>CMakeSelectBuildDir<CR>" },
         { "<leader>ctc", "<CMD>CMakeSelectCwd<CR>" },
@@ -154,6 +153,7 @@ return {
             vim.keymap.set("n", "<leader>cb", "<CMD>CMakeBuild<CR>")
             vim.keymap.set("n", "<leader>cc", "<CMD>CMakeClean<CR>")
             vim.keymap.set("n", "<leader>cr", "<CMD>CMakeRun<CR>")
+            vim.keymap.set("n", "<leader>ctt", "<CMD>CMakeSelectLaunchTarget<CR>")
         end
     end
 }
