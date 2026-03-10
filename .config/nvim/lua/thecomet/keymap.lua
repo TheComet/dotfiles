@@ -34,74 +34,9 @@ vim.keymap.set("n", "gp", "`[v`]")
 vim.keymap.set("n", "<leader>l", "<CMD>set relativenumber!<CR>")
 
 -- Default to :make. cmake.nvim will override this if it detects a CMakeLists.txt
-local function default_build()
-  vim.cmd("wa")
-  local curwin = vim.api.nvim_get_current_win()
-  vim.cmd("copen")
-  vim.api.nvim_set_current_win(curwin)
-  vim.notify("Running make…", vim.log.levels.INFO)
-  on_data = function(_, data)
-    if not data then return end
-    local items = {}
-    for _, line in ipairs(data) do
-      if line ~= "" then
-        table.insert(items, { text = line })
-      end
-    end
-    if #items > 0 then
-      vim.fn.setqflist({}, 'a', { items = items})
-      vim.cmd.cbottom()
-    end
-  end
-  vim.fn.setqflist({}, 'r')
-  vim.fn.jobstart(vim.o.makeprg, {
-    stdout_buffered = false,
-    stderr_buffered = false,
-    on_stdout = on_data,
-    on_stderr = on_data,
-    on_exit = function(_, code)
-      vim.schedule(function()
-        if code == 0 then
-          vim.notify("Make successful!", vim.log.levels.INFO)
-          vim.cmd("cclose")
-        else
-          vim.notify("Make failed (exit code " .. code .. ")", vim.log.levels.ERROR)
-        end
-      end)
-    end,
-  })
-end
 vim.keymap.set("n", "<leader>cc", function()
-  vim.cmd("silent make clean")
+  require("thecomet.makefile").clean()
 end)
-local last_run_command = ""
-vim.keymap.set("n", "<leader>cr", function()
-  default_build()
-  if last_run_command == "" then
-    local make = require("thecomet.makefile")
-    local exe = make.get_executable_name()
-    if exe then last_run_command = "./" .. exe end
-  end
-  vim.ui.input({
-      prompt = "Command: ",
-      default = last_run_command
-    }, function(args)
-    if args ~= nil then
-      local update_qflist = function(err, data)
-        vim.schedule(function()
-          if data then
-            vim.fn.setqflist({}, "a", { lines = vim.split(data, "\n") })
-          end
-        end)
-      end
-      last_run_command = args
-      vim.system({"sh", "-c", last_run_command}, {
-        text = true,
-        cwd = vim.loop.cwd(),
-        stdout = update_qflist,
-        stderr = update_qflist,
-      })
-    end
-  end)
+vim.keymap.set("n", "<leader>cb", function()
+  require("thecomet.makefile").build()
 end)
-vim.keymap.set("n", "<leader>cb", default_build, { noremap = true, silent = true })

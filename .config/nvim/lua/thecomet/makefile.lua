@@ -9,38 +9,30 @@ local function makefile_exists()
   return vim.fn.filereadable(makefile) == 1
 end
 
-local function all_targets()
+local function targets()
   local makefile = makefile_path()
   if not makefile then return end
   local lines = vim.fn.readfile(makefile)
+  local patterns = {
+    "^all%s*:%s*(.+)$",
+    "^tests%s*:%s*(.+)$",
+    "^game%s*:%s*(.+)$",
+  }
+  local result = {}
   for _, line in ipairs(lines) do
     line = line:gsub("#.*$", "") -- strip comments
-    local targets = line:match("^all%s*:%s*(.+)$")
-    if targets then
-      local result = {}
-      for t in targets:gmatch("%S+") do
-        table.insert(result, t)
+    for _, pattern in ipairs(patterns) do
+      local targets = line:match(pattern)
+      if targets then
+        for t in targets:gmatch("%S+") do
+          if t ~= "doc" and t ~= "tests" and t ~= "game" then
+            table.insert(result, t)
+          end
+        end
       end
-      return result
     end
   end
-end
-
-local function test_targets()
-  local makefile = makefile_path()
-  if not makefile then return end
-  local lines = vim.fn.readfile(makefile)
-  for _, line in ipairs(lines) do
-    line = line:gsub("#.*$", "") -- strip comments
-    local targets = line:match("^test%s*:%s*(.+)$")
-    if targets then
-      local result = {}
-      for t in targets:gmatch("%S+") do
-        table.insert(result, t)
-      end
-      return result
-    end
-  end
+  return result
 end
 
 local function expand_vars(str, vars)
@@ -103,10 +95,51 @@ print_all_vars:
   return variables
 end
 
+local function output_to_qflist(err, data)
+  for _, line in ipairs(data) do
+    if line ~= "" then
+      vim.fn.setqflist({}, 'a', { lines = { line } })
+    end
+  end
+  vim.cmd.cbottom()
+end
+
+local function build()
+  vim.cmd("wa")
+  local curwin = vim.api.nvim_get_current_win()
+  vim.cmd("copen")
+  vim.api.nvim_set_current_win(curwin)
+  vim.notify("Running make…", vim.log.levels.INFO)
+  vim.fn.setqflist({}, 'r')
+  vim.fn.jobstart(vim.o.makeprg, {
+    stdout_buffered = false,
+    stderr_buffered = false,
+    on_stdout = output_to_qflist,
+    on_stderr = output_to_qflist,
+    on_exit = function(_, code)
+      vim.schedule(function()
+        if code == 0 then
+          vim.notify("Make successful!", vim.log.levels.INFO)
+          vim.cmd("cclose")
+        else
+          vim.notify("Make failed (exit code " .. code .. ")",
+            vim.log.levels.ERROR)
+        end
+      end)
+    end,
+  })
+end
+
+local function clean()
+  vim.cmd("silent make clean")
+end
+
 return {
   exists = makefile_exists,
-  all_targets = all_targets,
+  targets = targets,
   test_targets = test_targets,
   collect_variables = collect_variables,
   expand_vars = expand_vars,
+  build = build,
+  clean = clean,
 }

@@ -21,10 +21,7 @@ end
 local function get_makefile_targets()
   local targets = {}
   local vars = makefile.collect_variables()
-  for _, target in ipairs(makefile.all_targets()) do
-    table.insert(targets, makefile.expand_vars(target, vars))
-  end
-  for _, target in ipairs(makefile.test_targets()) do
+  for _, target in ipairs(makefile.targets()) do
     table.insert(targets, makefile.expand_vars(target, vars))
   end
   return targets
