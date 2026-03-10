@@ -41,12 +41,22 @@ local function default_build()
   vim.api.nvim_set_current_win(curwin)
   vim.notify("Running make…", vim.log.levels.INFO)
   on_data = function(_, data)
-    vim.fn.setqflist({}, 'a', { lines = data })
+    if not data then return end
+    local items = {}
+    for _, line in ipairs(data) do
+      if line ~= "" then
+        table.insert(items, { text = line })
+      end
+    end
+    if #items > 0 then
+      vim.fn.setqflist({}, 'a', { items = items})
+      vim.cmd.cbottom()
+    end
   end
   vim.fn.setqflist({}, 'r')
   vim.fn.jobstart(vim.o.makeprg, {
-    --stdout_buffered = true,
-    --stderr_buffered = true,
+    stdout_buffered = false,
+    stderr_buffered = false,
     on_stdout = on_data,
     on_stderr = on_data,
     on_exit = function(_, code)
@@ -56,7 +66,6 @@ local function default_build()
           vim.cmd("cclose")
         else
           vim.notify("Make failed (exit code " .. code .. ")", vim.log.levels.ERROR)
-          vim.cmd("silent cc 1")
         end
       end)
     end,
