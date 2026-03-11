@@ -140,13 +140,14 @@ local function find_test_and_suite_names()
 end
 
 local function run_gdb_in_tmux(executable_filepath, args)
+  local sock = "/tmp/gdb-nvim.sock." .. vim.fn.getpid()
   local working_dir = vim.fs.dirname(executable_filepath)
-  local command = string.format("tmux split-window -l 30%% -v -c %s 'gdb --args %s %s'",
+  local command = string.format("tmux split-window -e NVIM_GDB_SOCKET=%s -c %s -l 30%% -v 'gdb --args %s %s'",
+    sock,
     working_dir,
     executable_filepath,
     args and table.concat(args, " ") or "")
 
-  local sock = "/tmp/gdb-nvim.sock"
   if not vim.tbl_contains(vim.fn.serverlist(), sock) then
     vim.fn.serverstart(sock)
   end

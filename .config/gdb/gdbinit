@@ -9,6 +9,9 @@ set auto-load safe-path /
 set auto-load python-scripts on
 set breakpoint pending on
 
+# Make C++ shut the hell up
+skip -gfile /usr/include/c++/*
+
 source ~/.gdbinit
 
 python

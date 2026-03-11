@@ -5,7 +5,8 @@ import pynvim
 
 class TmuxPaneController:
     def __init__(self):
-        self.sock_path = "/tmp/gdb-nvim.sock"
+        #self.sock_path = os.environ.get("NVIM_GDB_SOCKET", f"/tmp/gdb-nvim.sock.{os.getpid()}")
+        self.sock_path = os.environ.get("NVIM_GDB_SOCKET", "oops")
         if os.path.exists(self.sock_path):
             self.nvim = pynvim.attach("socket", path=self.sock_path)
             self.tmux_pane_id = None
@@ -93,7 +94,7 @@ class TmuxViewerHook(gdb.Command):
                 self.tmux_controller = TmuxPaneController()
             self.tmux_controller.jump_to(filename, lineno)
         except Exception as e:
-            #gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
+            gdb.write(f"[tmux-viewer] Error: {e}\n", gdb.STDERR)
             pass
 
 
