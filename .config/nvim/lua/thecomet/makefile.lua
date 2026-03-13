@@ -9,46 +9,6 @@ local function makefile_exists()
   return vim.fn.filereadable(makefile) == 1
 end
 
-local function targets()
-  local makefile = makefile_path()
-  if not makefile then return end
-  local lines = vim.fn.readfile(makefile)
-  local patterns = {
-    "^all%s*:%s*(.+)$",
-    "^tests%s*:%s*(.+)$",
-    "^game%s*:%s*(.+)$",
-  }
-  local result = {}
-  for _, line in ipairs(lines) do
-    line = line:gsub("#.*$", "") -- strip comments
-    for _, pattern in ipairs(patterns) do
-      local targets = line:match(pattern)
-      if targets then
-        for t in targets:gmatch("%S+") do
-          if t ~= "doc" and t ~= "tests" and t ~= "game" then
-            table.insert(result, t)
-          end
-        end
-      end
-    end
-  end
-  return result
-end
-
-local function expand_vars(str, vars)
-  return (str:gsub("%$%(([%w_]+)%)", function(name)
-    local val = vars[name]
-    -- unknown variable
-    if not val then return nil end
-
-    if type(val) == "table" then
-      return table.concat(val, " ")
-    end
-
-    return tostring(val)
-  end))
-end
-
 local function canonicalize_include_paths(variables)
   for name, str in pairs(variables) do
     variables[name] = str:gsub("%-I%s*([^%s]+)", function(path)
@@ -95,6 +55,58 @@ print_all_vars:
   return variables
 end
 
+local function expand_vars(str, vars)
+  return (str:gsub("%$%(([%w_]+)%)", function(name)
+    local val = vars[name]
+    -- unknown variable
+    if not val then return nil end
+
+    if type(val) == "table" then
+      return table.concat(val, " ")
+    end
+
+    return tostring(val)
+  end))
+end
+
+local function targets()
+  local makefile = makefile_path()
+  if not makefile then return end
+  local lines = vim.fn.readfile(makefile)
+  local vars = collect_variables()
+
+  local phony_targets = { "all", "tests", "tests-y", "game", "doc", "doc-y" }
+  local patterns = {}
+  for _, target in ipairs(phony_targets) do
+    target = string.gsub(target, "%-", "%%-")
+    table.insert(patterns, "^" .. target .. "%s*:%s*(.+)$")
+  end
+
+  local function is_phony_target(target)
+    for _, t in ipairs(phony_targets) do
+      if t == target then return true end
+    end
+    return false
+  end
+
+  local result = {}
+  for _, line in ipairs(lines) do
+    line = line:gsub("#.*$", "") -- strip comments
+    for _, pattern in ipairs(patterns) do
+      local targets = line:match(pattern)
+      if targets then
+        for t in targets:gmatch("%S+") do
+          t = expand_vars(t, vars)
+          if is_phony_target(t) == false then
+            table.insert(result, t)
+          end
+        end
+      end
+    end
+  end
+  return result
+end
+
 local function output_to_qflist(err, data)
   for _, line in ipairs(data) do
     if line ~= "" then
@@ -137,9 +149,6 @@ end
 return {
   exists = makefile_exists,
   targets = targets,
-  test_targets = test_targets,
-  collect_variables = collect_variables,
-  expand_vars = expand_vars,
   build = build,
   clean = clean,
 }

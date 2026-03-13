@@ -108,9 +108,7 @@ local function create_clangd_cmd()
 
   if makefile.exists() then
     local targets = makefile.targets()
-    local vars = makefile.collect_variables()
-    local target = makefile.expand_vars(targets[1], vars)
-    local build_dir = vim.fs.dirname(target)
+    local build_dir = vim.fs.dirname(targets[1])
     local compile_commands = build_dir .. "/compile_commands.json"
     write_compile_commands_from_makefile(build_dir)
     table.insert(cmd, "--compile-commands-dir=" .. build_dir)

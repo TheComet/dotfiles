@@ -33,7 +33,7 @@ class HexDump(gdb.Command):
             width = 16
 
         mem = inferior.read_memory(addr, bytes)
-        pr_addr = int(str(addr), 16)
+        pr_addr = int(addr)
         pr_offset = width
 
         if align:

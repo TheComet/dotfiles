@@ -20,9 +20,8 @@ end
 
 local function get_makefile_targets()
   local targets = {}
-  local vars = makefile.collect_variables()
-  for _, target in ipairs(makefile.targets()) do
-    table.insert(targets, makefile.expand_vars(target, vars))
+  for _, target in ipairs(makefile.targets(vars)) do
+    table.insert(targets, target)
   end
   return targets
 end
@@ -183,6 +182,11 @@ local function select_target()
 end
 
 local function run_last_target_in_gdb(args)
+  local cmake = is_cmake_project()
+  if cmake then
+    last_run_target = cmake.get_launch_target_path()
+  end
+
   last_run_args = args
   if not last_run_target then
     select_target()
