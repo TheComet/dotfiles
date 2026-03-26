@@ -18,10 +18,7 @@ local function canonicalize_include_paths(variables)
   return variables
 end
 
-local function collect_variables()
-  local makefile = makefile_path()
-  if not makefile then return end
-
+local function collect_variables(makefile)
   local result = vim.system(
     { "make", "-f", makefile, "-f", "-", "print_all_vars" },
     { stdin = [[
@@ -73,7 +70,7 @@ local function targets()
   local makefile = makefile_path()
   if not makefile then return end
   local lines = vim.fn.readfile(makefile)
-  local vars = collect_variables()
+  local vars = collect_variables(makefile)
 
   local phony_targets = { "all", "tests", "tests-y", "game", "doc", "doc-y" }
   local patterns = {}

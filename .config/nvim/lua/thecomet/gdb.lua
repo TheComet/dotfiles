@@ -26,18 +26,6 @@ local function get_makefile_targets()
   return targets
 end
 
-local function get_executable_file_path()
-  local cmake = is_cmake_project()
-  if cmake then
-    return cmake.get_launch_target_path()
-  end
-
-  if makefile.exists() then
-    local targets = get_makefile_targets()
-    if #targets > 0 then return vim.loop.cwd() .. "/" .. targets[1] end
-  end
-end
-
 local function get_program_special_args()
   local cmake = is_cmake_project()
   if cmake then
@@ -47,11 +35,10 @@ local function get_program_special_args()
 end
 
 local function gdbinit_filepath()
-  local executable = get_executable_file_path()
-  if not executable then
+  if not last_run_target then
     return nil
   end
-  local working_dir = vim.fs.dirname(executable)
+  local working_dir = vim.fs.dirname(last_run_target)
   return working_dir .. "/.gdbinit"
 end
 

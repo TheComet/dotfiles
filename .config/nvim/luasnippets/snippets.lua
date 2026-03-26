@@ -163,6 +163,10 @@ gmock_snippets = {
         i(1, "func"),
         i(2, "args"),
       }),
+      fmt("EXPECT_CALL({}, JOMOCK_FUNC({}))", {
+        i(1, "func"),
+        i(2, "args"),
+      }),
     }),
   }),
 
