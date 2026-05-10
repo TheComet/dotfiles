@@ -168,6 +168,24 @@ local function select_target()
   error("No executable found. Please configure the project first (using cmake-tools).")
 end
 
+local function run_last_target_in_background(args)
+  local cmake = is_cmake_project()
+  if cmake then
+    last_run_target = cmake.get_launch_target_path()
+  end
+
+  last_run_args = args
+  if not last_run_target then
+    select_target()
+    -- async case
+    if not last_run_target then return end
+  end
+
+  local working_dir = vim.fs.dirname(last_run_target)
+  local command = last_run_target .. (args and table.concat(args, " ") or "")
+  vim.fn.jobstart(command, { cwd = working_dir })
+end
+
 local function run_last_target_in_gdb(args)
   local cmake = is_cmake_project()
   if cmake then
@@ -252,12 +270,17 @@ vim.keymap.set("n", "<leader>db", function()
   update_gdbinit_with_breakpoints()
 end)
 
-vim.keymap.set("n", "<leader>dr", function()
+vim.keymap.set("n", "<leader>cr", function()
   local args = {}
-
   local cmake = is_cmake_project()
   if cmake then args = cmake.get_launch_args() end
+  run_last_target_in_background(args)
+end)
 
+vim.keymap.set("n", "<leader>dr", function()
+  local args = {}
+  local cmake = is_cmake_project()
+  if cmake then args = cmake.get_launch_args() end
   run_last_target_in_gdb(args)
 end)
 

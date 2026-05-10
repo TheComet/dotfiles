@@ -5,8 +5,10 @@ vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '>-2<CR>gv=gv")
 
 -- Justify text
-vim.keymap.set("n", "<leader>j", ":JustifyText<CR>")
-vim.keymap.set("v", "<leader>j", ":'<,'>JustifyText<CR>")
+vim.keymap.set("v", "gj", ":JustifyText<CR>")
+vim.keymap.set("n", "gjip", "vipgj", { remap = true })
+vim.keymap.set("v", "<leader>lf", ":!~/documents/programming/cpp/commentfmt/commentfmt<CR>")
+vim.keymap.set("n", "<leader>lf", ":%!~/documents/programming/cpp/commentfmt/commentfmt<CR>")
 
 -- If text is highlighted in visual mode, and "/" is pressed, paste the highlighted text into the prompt
 vim.keymap.set("v", "//", "y/<C-R>=escape(@\", '/')<CR>")
