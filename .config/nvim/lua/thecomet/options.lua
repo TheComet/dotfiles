@@ -67,3 +67,9 @@ vim.api.nvim_create_autocmd("BufRead", {
     vim.bo.filetype = "basic"
   end,
 })
+vim.api.nvim_create_autocmd("BufRead", {
+  pattern = "*.sqlgen",
+  callback = function()
+    vim.bo.filetype = "sql"
+  end,
+})

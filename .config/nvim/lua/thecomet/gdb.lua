@@ -165,7 +165,11 @@ local function select_target()
     end
   end
   
-  error("No executable found. Please configure the project first (using cmake-tools).")
+  vim.ui.input({ prompt = "Executable: ", default = last_run_target}, function(args)
+    if args ~= nil then
+      last_run_target = args
+    end
+  end)
 end
 
 local function run_last_target_in_background(args)
