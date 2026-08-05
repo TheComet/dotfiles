@@ -168,7 +168,7 @@ vim.lsp.config.luals = {
 
 vim.lsp.config.clangd = {
   cmd = create_clangd_cmd(),
-  filetypes = { "c", "cpp", "cc" },
+  filetypes = { "c", "cpp" },
   root_dir = find_project_root({
     "compile_commands.json",
     ".clangd",
