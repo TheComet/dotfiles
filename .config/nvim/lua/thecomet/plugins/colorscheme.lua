@@ -1,5 +1,18 @@
 return {
     { "catppuccin/nvim", name = "catppuccin",
+      opts = {
+        highlight_overrides = {
+          all = function(colors)
+            return {
+              -- Disable italic style on comments
+              Comment = { style = {} },
+            }
+          end,
+        },
+      },
+      setup = function(_, opts)
+        require("catppuccin").setup(opts)
+      end,
       config = function()
           vim.cmd.colorscheme("catppuccin-mocha")
           vim.keymap.set("n", "<leader>pc", "<CMD>Telescope colorscheme<CR>")

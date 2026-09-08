@@ -19,21 +19,17 @@ local function determine_cmake_compile_commands_dir()
 end
 
 local function write_compile_commands_from_makefile(build_dir)
-   local result = vim.system(
-    { "make", "-BnrR", "test" },
-    { text = true }
-  ):wait()
-  if result.code ~= 0 then
-    result = vim.system(
-      { "make", "-BnrR" },
-      { text = true }
-    ):wait()
-    if result.code ~= 0 then
-      vim.notify("make -n failed", vim.log.levels.ERROR)
-      return
-    end
+  -- Some makefiles have a target to create compile_commands
+  local result = vim.system({ "make", "compile_commands" }, { text = true }):wait()
+  if result.code == 0 then
+    return
   end
 
+  result = vim.system({ "make", "-BnrR" }, { text = true }):wait()
+  if result.code ~= 0 then
+    vim.notify("make -n failed", vim.log.levels.ERROR)
+    return
+  end
   local lines = vim.split(result.stdout, "\n", { trimempty = true })
 
   -- 1. Reconstruct wrapped commands
@@ -109,7 +105,6 @@ local function create_clangd_cmd()
   if makefile.exists() then
     local targets = makefile.targets()
     local build_dir = vim.fs.dirname(targets[1])
-    local compile_commands = build_dir .. "/compile_commands.json"
     write_compile_commands_from_makefile(build_dir)
     table.insert(cmd, "--compile-commands-dir=" .. build_dir)
     return cmd

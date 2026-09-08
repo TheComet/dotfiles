@@ -125,14 +125,35 @@ local function find_test_and_suite_names()
   end
 end
 
+local function get_gdb_command(executable_filepath, args)
+  local function ends_with(str, ending)
+    return str:sub(-#ending) == ending
+  end
+
+  local gdb_executable = "gdb"
+  local gdb_server = ""
+  if ends_with(executable_filepath, ".gba") then
+    -- Official mgba in Gentoo doesn't appear to have a GDB server
+    local mgba = "/home/thecomet/documents/programming/cpp/mgba/build/qt/mgba-qt"
+    gdb_server = string.format("%s -g %s &", mgba, executable_filepath)
+    gdb_executable = "arm-none-eabi-gdb -ex \"target remote localhost:2345\""
+    executable_filepath = executable_filepath:gsub("%.[^%.]+$", ".elf")
+  end
+
+  return string.format("%s %s --args %s %s",
+    gdb_server,
+    gdb_executable,
+    executable_filepath,
+    args and table.concat(args, " ") or "")
+end
+
 local function run_gdb_in_tmux(executable_filepath, args)
   local sock = "/tmp/gdb-nvim.sock." .. vim.fn.getpid()
   local working_dir = vim.fs.dirname(executable_filepath)
-  local command = string.format("tmux split-window -e NVIM_GDB_SOCKET=%s -c %s -l 30%% -v 'gdb --args %s %s'",
+  local command = string.format("tmux split-window -e NVIM_GDB_SOCKET=%s -e PYTHONPATH=$PYTHONPATH -c %s -l 30%% -v '%s'",
     sock,
     working_dir,
-    executable_filepath,
-    args and table.concat(args, " ") or "")
+    get_gdb_command(executable_filepath, args))
 
   if not vim.tbl_contains(vim.fn.serverlist(), sock) then
     vim.fn.serverstart(sock)
