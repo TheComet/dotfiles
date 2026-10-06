@@ -45,6 +45,8 @@ vim.o.errorformat = vim.o.errorformat .. ',%f:%l.%c: %m'
 vim.o.errorformat = vim.o.errorformat .. ',CMake Error at %f:%l%.%#'
 -- GTest
 vim.o.errorformat = vim.o.errorformat .. ',%f:%l: Failure'
+-- gcovr --txt
+vim.o.errorformat = vim.o.errorformat .. ',gcovr: %f:%l'
 
 -- Treat .h as c files instead of cpp files
 vim.api.nvim_create_autocmd("BufRead", {

@@ -1,15 +1,6 @@
 --vim.lsp.set_log_level(vim.log.levels.DEBUG)
 vim.lsp.set_log_level(vim.log.levels.OFF)
 
-local function find_project_root(patterns)
-  local path = vim.fn.expand('%:p:h')
-  local root = vim.fs.find(patterns, { path = path, upward = true })[1]
-  if not root or root == vim.env.HOME then
-    return path
-  end
-  return vim.fn.fnamemodify(root, ':h')
-end
-
 local function determine_cmake_compile_commands_dir()
   local status, cmake = pcall(require, "cmake-tools")
   if not status then return nil end
@@ -136,11 +127,11 @@ end
 vim.lsp.config.luals = {
   cmd = { "lua-language-server" },
   filetypes = { "lua" },
-  root_dir = find_project_root({
+  root_markers = {
     ".luarc.json",
     ".luarc.jsonc",
     "lazy-lock.json",
-  }),
+  },
   settings = {
     Lua = {
       runtime = {
@@ -161,16 +152,36 @@ vim.lsp.config.luals = {
   },
 }
 
+vim.lsp.config.pyright = {
+  cmd = { "pyright-langserver", "--stdio" },
+  filetypes = { "python" },
+  single_file_support = true,
+  settings = {
+    python = {
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+        diagnosticMode = "openFilesOnly",
+      }
+    }
+  },
+  root_markers = {
+    "requirements.txt",
+    "setup.py",
+    "pyproject.toml",
+  },
+}
+
 vim.lsp.config.clangd = {
   cmd = create_clangd_cmd(),
   filetypes = { "c", "cpp" },
-  root_dir = find_project_root({
+  root_markers = {
     "compile_commands.json",
     ".clangd",
     "configure.ac",
     "CMakeLists.txt",
     "Makefile",
-  }),
+  },
 }
 
 vim.lsp.config("*", {
@@ -180,6 +191,7 @@ vim.lsp.config("*", {
 vim.lsp.enable({
   "clangd",
   "luals",
+  "pyright",
 })
 
 vim.api.nvim_create_user_command("ClangdStop", function(opts)
